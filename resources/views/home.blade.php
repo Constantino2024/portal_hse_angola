@@ -1,0 +1,3382 @@
+@extends('layouts.app')
+
+@section('title', 'Saúde, Segurança e Ambiente')
+
+@section('meta_description', 'Portal HSE: Notícias, vagas, eventos e conteúdos sobre Saúde, Segurança e Ambiente em Angola e no mundo.')
+
+@section('content')
+
+{{-- GRÁFICO EM TEMPO REAL DE PROFISSIONAIS --}}
+<!--<section class="professionals-chart-section mt-8">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Rede de Profissionais HSE</h2>
+            <p class="section-subtitle">Estatísticas em tempo real de especialistas cadastrados</p>
+        </div>
+        
+        <div class="row g-4">
+            {{-- Gráfico Principal --}}
+            <div class="col-lg-8">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h4><i class="fas fa-chart-line me-2"></i> Distribuição por Especialidade</h4>
+                        <div class="chart-controls">
+                            <button class="chart-btn active" data-chart="bar">
+                                <i class="fas fa-chart-bar"></i>
+                            </button>
+                            <button class="chart-btn" data-chart="pie">
+                                <i class="fas fa-chart-pie"></i>
+                            </button>
+                            <button class="chart-btn" data-chart="line">
+                                <i class="fas fa-chart-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="professionalsChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        @php
+                            $areasData = [
+                                'tecnico_trabalho' => ['label' => 'Técnicos de Segurança', 'color' => '#3b82f6'],
+                                'medico_trabalho' => ['label' => 'Médicos do Trabalho', 'color' => '#10b981'],
+                                'psicologos' => ['label' => 'Psicólogos', 'color' => '#8b5cf6'],
+                                'ambientalistas' => ['label' => 'Ambientalistas', 'color' => '#f59e0b'],
+                                'higienistas' => ['label' => 'Higienistas', 'color' => '#ef4444'],
+                                'ergonomistas' => ['label' => 'Ergonomistas', 'color' => '#06b6d4']
+                            ];
+                        @endphp
+                        @foreach($areasData as $area => $data)
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: {{ $data['color'] }};"></span>
+                                <span class="legend-label">{{ $data['label'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            
+            {{-- Cards de Estatísticas --}}
+            <div class="col-lg-4">
+                <div class="stats-sidebar">
+                    <div class="stats-card total-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-content">
+                            <h3 id="totalProfessionalsCounter">{{ number_format($totalProfessionals, 0, ',', '.') }}</h3>
+                            <p>Total de Profissionais</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-card new-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="stats-content">
+                            <h3 id="newThisMonth">{{ $newThisMonth }}</h3>
+                            <p>Novos este Mês</p>
+                        </div>
+                        @php
+                            $lastMonthCount = \App\Models\HseTalentProfile::whereMonth('created_at', now()->subMonth()->month)
+                                ->whereYear('created_at', now()->subMonth()->year)
+                                ->count();
+                            $growth = $lastMonthCount > 0 ? (($newThisMonth - $lastMonthCount) / $lastMonthCount) * 100 : 0;
+                        @endphp
+                        @if($growth > 0)
+                            <div class="stats-trend">
+                                <i class="fas fa-arrow-up text-success"></i>
+                                <span class="text-success">+{{ number_format($growth, 1) }}%</span>
+                            </div>
+                        @elseif($growth < 0)
+                            <div class="stats-trend">
+                                <i class="fas fa-arrow-down text-danger"></i>
+                                <span class="text-danger">{{ number_format($growth, 1) }}%</span>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    
+                    <div class="stats-card location-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="stats-content">
+                            <h3 id="totalProvinces">{{ $totalProvinces }}</h3>
+                            <p>Total Províncias</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {{-- Cards Detalhados dos Profissionais --}}
+        <div class="professionals-detailed-cards mt-5">
+            <div class="row g-4">
+                {{-- Técnicos de Segurança --}}
+                <div class="col-md-6 col-lg-4 col-xl-2">
+                    <div class="professional-card" data-category="safety">
+                        <div class="card-icon">
+                            <i class="fas fa-hard-hat"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4 class="card-title">Técnicos de Segurança</h4>
+                            <div class="card-stats">
+                                <div class="stat-number" id="safetyCount">{{ number_format($totalSafetyTechnicians, 0, ',', '.') }}</div>
+                                @php
+                                    $newSafety = \App\Models\HseTalentProfile::where('area', 'tecnico_trabalho')
+                                        ->whereBetween('created_at', [now()->startOfWeek(), now()])
+                                        ->count();
+                                @endphp
+                                @if($newSafety > 0)
+                                    <div class="stat-change">
+                                        <i class="fas fa-arrow-up text-success"></i>
+                                        <span class="text-success">+{{ $newSafety }} esta semana</span>
+                                    </div>
+                                @endif
+                            </div>
+                            <button class="card-btn" data-bs-toggle="modal" data-bs-target="#safetyModal">
+                                Ver Lista Completa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                {{-- Médicos do Trabalho --}}
+                <div class="col-md-6 col-lg-4 col-xl-2">
+                    <div class="professional-card" data-category="medical">
+                        <div class="card-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4 class="card-title">Médicos do Trabalho</h4>
+                            <div class="card-stats">
+                                <div class="stat-number" id="medicalCount">{{ number_format($totalOccupationalDoctors, 0, ',', '.') }}</div>
+                                @php
+                                    $newMedical = \App\Models\HseTalentProfile::where('area', 'medico_trabalho')
+                                        ->whereBetween('created_at', [now()->startOfWeek(), now()])
+                                        ->count();
+                                @endphp
+                                @if($newMedical > 0)
+                                    <div class="stat-change">
+                                        <i class="fas fa-arrow-up text-success"></i>
+                                        <span class="text-success">+{{ $newMedical }} esta semana</span>
+                                    </div>
+                                @endif
+                            </div>
+                            <button class="card-btn" data-bs-toggle="modal" data-bs-target="#medicalModal">
+                                Ver Lista Completa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                {{-- Psicólogos do Trabalho --}}
+                <div class="col-md-6 col-lg-4 col-xl-2">
+                    <div class="professional-card" data-category="psychology">
+                        <div class="card-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4 class="card-title">Psicólogos</h4>
+                            <div class="card-stats">
+                                <div class="stat-number" id="psychologyCount">{{ number_format($totalPsychologists, 0, ',', '.') }}</div>
+                                @php
+                                    $newPsychology = \App\Models\HseTalentProfile::where('area', 'psicologos')
+                                        ->whereBetween('created_at', [now()->startOfWeek(), now()])
+                                        ->count();
+                                @endphp
+                                @if($newPsychology > 0)
+                                    <div class="stat-change">
+                                        <i class="fas fa-arrow-up text-success"></i>
+                                        <span class="text-success">+{{ $newPsychology }} esta semana</span>
+                                    </div>
+                                @endif
+                            </div>
+                            <button class="card-btn" data-bs-toggle="modal" data-bs-target="#psychologyModal">
+                                Ver Lista Completa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                {{-- Ambientalistas --}}
+                <div class="col-md-6 col-lg-4 col-xl-2">
+                    <div class="professional-card" data-category="environmental">
+                        <div class="card-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4 class="card-title">Ambientalistas</h4>
+                            <div class="card-stats">
+                                <div class="stat-number" id="environmentalCount">{{ number_format($totalEnvironmentalists, 0, ',', '.') }}</div>
+                                @php
+                                    $newEnvironmental = \App\Models\HseTalentProfile::where('area', 'ambientalistas')
+                                        ->whereBetween('created_at', [now()->startOfWeek(), now()])
+                                        ->count();
+                                @endphp
+                                @if($newEnvironmental > 0)
+                                    <div class="stat-change">
+                                        <i class="fas fa-arrow-up text-success"></i>
+                                        <span class="text-success">+{{ $newEnvironmental }} esta semana</span>
+                                    </div>
+                                @endif
+                            </div>
+                            <button class="card-btn" data-bs-toggle="modal" data-bs-target="#environmentalModal">
+                                Ver Lista Completa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                {{-- Higienistas --}}
+                <div class="col-md-6 col-lg-4 col-xl-2">
+                    <div class="professional-card" data-category="hygiene">
+                        <div class="card-icon">
+                            <i class="fas fa-hand-sparkles"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4 class="card-title">Higienistas</h4>
+                            <div class="card-stats">
+                                <div class="stat-number" id="hygieneCount">{{ number_format($totalHygienists, 0, ',', '.') }}</div>
+                                @php
+                                    $newHygiene = \App\Models\HseTalentProfile::where('area', 'higienistas')
+                                        ->whereBetween('created_at', [now()->startOfWeek(), now()])
+                                        ->count();
+                                @endphp
+                                @if($newHygiene > 0)
+                                    <div class="stat-change">
+                                        <i class="fas fa-arrow-up text-success"></i>
+                                        <span class="text-success">+{{ $newHygiene }} esta semana</span>
+                                    </div>
+                                @endif
+                            </div>
+                            <button class="card-btn" data-bs-toggle="modal" data-bs-target="#hygieneModal">
+                                Ver Lista Completa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+</section>-->
+
+{{-- HERO / DESTAQUE PRINCIPAL COM CAROUSEL MODERNO --}}
+@if($featured->count())
+<section class="hero-carousel-section">
+    <div class="container-fluid px-0">
+        <div id="modernHeroCarousel" class="carousel slide" data-bs-ride="carousel">
+            {{-- Indicadores --}}
+            <div class="carousel-indicators-container">
+                <div class="container position-relative">
+                    <div class="carousel-indicators-wrapper">
+                        @foreach($featured as $index => $post)
+                        <button type="button" 
+                                data-bs-target="#modernHeroCarousel" 
+                                data-bs-slide-to="{{ $index }}" 
+                                class="{{ $index === 0 ? 'active' : '' }}"
+                                aria-label="Slide {{ $index + 1 }}">
+                            <span class="indicator-progress"></span>
+                            <span class="indicator-label d-none d-md-block">
+                                {{ \Illuminate\Support\Str::limit($post->title, 30) }}
+                            </span>
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            
+            {{-- Slides --}}
+            <div class="carousel-inner">
+                @foreach($featured as $index => $post)
+                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}" data-bs-interval="8000">
+                    <div class="carousel-slide-wrapper">
+                        {{-- Imagem de fundo com overlay --}}
+                        <div class="carousel-bg">
+                            @if($post->image_url)
+                                <img src="{{ asset('storage/'.$post->image_url) }}" 
+                                     class="carousel-bg-image"
+                                     alt="{{ $post->title }}"
+                                     loading="lazy">
+                            @endif
+                            <div class="carousel-gradient-overlay"></div>
+                        </div>
+                        
+                        {{-- Conteúdo --}}
+                        <div class="carousel-content">
+                            <div class="container">
+                                <div class="row align-items-center min-vh-80 py-5">
+                                    <div class="col-lg-7 col-xl-6">
+                                        <div class="carousel-card">
+                                            {{-- Categoria e data --}}
+                                            <div class="carousel-meta mb-4">
+                                                <span class="carousel-category badge">
+                                                    {{ $post->category->name ?? 'Destaque' }}
+                                                </span>
+                                                <span class="carousel-date ms-3">
+                                                    <i class="fas fa-calendar-alt me-1"></i>
+                                                    {{ optional($post->published_at)->format('d F, Y') }}
+                                                </span>
+                                            </div>
+                                            
+                                            {{-- Título --}}
+                                            <h1 class="carousel-title display-3 fw-bold text-white mb-4">
+                                                <a href="{{ route('posts.show', $post->slug) }}" class="text-white text-decoration-none">
+                                                    {{ $post->title }}
+                                                </a>
+                                            </h1>
+                                            
+                                            {{-- Resumo --}}
+                                            <p class="carousel-excerpt lead text-white-80 mb-5">
+                                                {{ $post->excerpt }}
+                                            </p>
+                                            
+                                            {{-- Estatísticas --}}
+                                            <!--<div class="carousel-stats d-flex flex-wrap gap-4 mb-5">
+                                                <div class="stat-item text-white">
+                                                    <div class="stat-icon">
+                                                        <i class="fas fa-eye"></i>
+                                                    </div>
+                                                    <div class="stat-content">
+                                                        <div class="stat-number">{{ $post->views ?? '1.2k' }}</div>
+                                                        <div class="stat-label">Visualizações</div>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-item text-white">
+                                                    <div class="stat-icon">
+                                                        <i class="fas fa-comment"></i>
+                                                    </div>
+                                                    <div class="stat-content">
+                                                        <div class="stat-number">{{ $post->comments_count ?? '45' }}</div>
+                                                        <div class="stat-label">Comentários</div>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-item text-white">
+                                                    <div class="stat-icon">
+                                                        <i class="fas fa-clock"></i>
+                                                    </div>
+                                                    <div class="stat-content">
+                                                        <div class="stat-number">{{ $post->reading_time ?? '5' }}</div>
+                                                        <div class="stat-label">Minutos</div>
+                                                    </div>
+                                                </div>
+                                            </div>-->
+                                            
+                                            {{-- Botões de ação --}}
+                                            <div class="carousel-actions d-flex flex-wrap gap-3">
+                                                <a href="{{ route('posts.show', $post->slug) }}" 
+                                                   class="btn btn-primary btn-lg px-5 rounded-pill">
+                                                    <span class="btn-label">Ler Notícia</span>
+                                                    <i class="fas fa-arrow-right ms-2"></i>
+                                                </a>
+                                                <button class="btn btn-outline-light btn-lg rounded-pill px-4"
+                                                        onclick="shareContent('{{ $post->title }}', '{{ route('posts.show', $post->slug) }}')">
+                                                    <i class="fas fa-share-alt me-2"></i>
+                                                    Compartilhar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            
+            {{-- Controles --}}
+            @if($featured->count() > 1)
+            <div class="carousel-controls">
+                <button class="carousel-control-prev" type="button" data-bs-target="#modernHeroCarousel" data-bs-slide="prev">
+                    <div class="control-wrapper">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#modernHeroCarousel" data-bs-slide="next">
+                    <div class="control-wrapper">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </button>
+            </div>
+            @endif
+            
+            {{-- Contador de slides --}}
+            <div class="slide-counter">
+                <div class="counter-current">01</div>
+                <div class="counter-divider"></div>
+                <div class="counter-total">0{{ $featured->count() }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
+
+{{-- SEÇÃO DE ESTATÍSTICAS --}}
+<!--<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" data-count="{{ $totalPosts ?? 1200 }}">0</h3>
+                    <p class="stat-label">Notícias Publicadas</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" data-count="{{ $totalReaders ?? 8500 }}">0</h3>
+                    <p class="stat-label">Leitores Mensais</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" data-count="{{ $totalJobs ?? 450 }}">0</h3>
+                    <p class="stat-label">Vagas Publicadas</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number" data-count="{{ $totalCourses ?? 85 }}">0</h3>
+                    <p class="stat-label">Cursos Disponíveis</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>-->
+
+{{-- SEÇÃO – SAÚDE, SEGURANÇA E AMBIENTE (TRÊS BOXES) --}}
+<section class="ssa-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Áreas de Actuação</h2>
+            <p class="section-subtitle">Explore os principais pilares do HSE e seus conteúdos especializados</p>
+        </div>
+        
+        <div class="ssa-grid">
+            <div class="ssa-card">
+                <div class="ssa-card-header">
+                    <div class="ssa-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3>Saúde Ocupacional</h3>
+                </div>
+                <div class="ssa-card-body">
+                    <p>Conteúdos sobre bem-estar, medicina do trabalho, ergonomia e prevenção de doenças profissionais.</p>
+                    <ul class="ssa-topics">
+                        <li><i class="fas fa-check-circle"></i> PCMSO e PPRA</li>
+                        <li><i class="fas fa-check-circle"></i> Ergonomia</li>
+                        <li><i class="fas fa-check-circle"></i> Saúde Mental</li>
+                        <li><i class="fas fa-check-circle"></i> EPIs</li>
+                    </ul>
+                </div>
+                <div class="ssa-card-footer">
+                    <a href="{{ route('posts.public') }}?category=saude" class="ssa-link">
+                        Ver Notícias <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="ssa-card featured">
+                <div class="ssa-card-header">
+                    <div class="ssa-icon">
+                        <i class="fas fa-hard-hat"></i>
+                    </div>
+                    <h3>Segurança do Trabalho</h3>
+                </div>
+                <div class="ssa-card-body">
+                    <p>Normas regulamentadoras, análise de riscos, prevenção de acidentes e gestão de segurança.</p>
+                    <ul class="ssa-topics">
+                        <li><i class="fas fa-check-circle"></i> NRs Aplicáveis</li>
+                        <li><i class="fas fa-check-circle"></i> Análise de Riscos</li>
+                        <li><i class="fas fa-check-circle"></i> CIPA</li>
+                        <li><i class="fas fa-check-circle"></i> Emergências</li>
+                    </ul>
+                </div>
+                <div class="ssa-card-footer">
+                    <a href="{{ route('posts.public') }}?category=seguranca" class="ssa-link">
+                        Ver Notícias <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="ssa-card">
+                <div class="ssa-card-header">
+                    <div class="ssa-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Meio Ambiente</h3>
+                </div>
+                <div class="ssa-card-body">
+                    <p>Sustentabilidade, gestão de resíduos, licenciamento ambiental e responsabilidade socioambiental.</p>
+                    <ul class="ssa-topics">
+                        <li><i class="fas fa-check-circle"></i> ISO 14001</li>
+                        <li><i class="fas fa-check-circle"></i> Resíduos Sólidos</li>
+                        <li><i class="fas fa-check-circle"></i> Efluentes</li>
+                        <li><i class="fas fa-check-circle"></i> ESG</li>
+                    </ul>
+                </div>
+                <div class="ssa-card-footer">
+                    <a href="{{ route('posts.public') }}?category=ambiente" class="ssa-link">
+                        Ver Notícias <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ÚLTIMAS NOTÍCIAS - SEÇÃO MELHORADA --}}
+<section class="latest-news-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="header-left">
+                <h2 class="section-title">Últimas Notícias</h2>
+                <p class="section-subtitle">Acompanhe as publicações mais recentes do Portal HSE</p>
+            </div>
+            <div class="header-right">
+                <a href="{{ route('posts.public') }}" class="btn-view-all">
+                    Ver Todas <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        {{-- Filtros de Categoria --}}
+        @if($categories->count())
+        <div class="category-filters">
+            <div class="filter-group">
+                <button class="filter-btn active" data-category="all">Todas</button>
+                @foreach($categories->take(6) as $category)
+                    <button class="filter-btn" data-category="{{ $category->slug }}">
+                        <i class="fas fa-folder"></i> {{ $category->name }}
+                    </button>
+                @endforeach
+                @if($categories->count() > 6)
+                <div class="dropdown">
+                    <button class="filter-btn filter-more dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Mais <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        @foreach($categories->slice(6) as $category)
+                            <button class="dropdown-item filter-btn" type="button" data-category="{{ $category->slug }}">
+                                {{ $category->name }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+            </div>
+            
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid" title="Visualização em Grade">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button class="view-btn" data-view="list" title="Visualização em Lista">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+        @endif
+        
+        {{-- Grid de Notícias --}}
+        <div class="news-container" id="newsContainer">
+            <div class="news-grid" id="newsGrid">
+                @foreach($recent as $post)
+                    <article class="news-card" data-categories="{{ $post->category->slug ?? 'geral' }}">
+                        <div class="news-card-image">
+                            <a href="{{ route('posts.show', $post->slug) }}">
+                                @if($post->image_url)
+                                    <img src="{{ asset('storage/'.$post->image_url) }}" 
+                                         alt="{{ $post->title }}"
+                                         loading="lazy">
+                                @else
+                                    <div class="image-placeholder">
+                                        <i class="fas fa-newspaper"></i>
+                                    </div>
+                                @endif
+                            </a>
+                            <div class="news-card-badge">
+                                <span class="category-badge">{{ $post->category->name ?? 'Geral' }}</span>
+                                @if($post->is_featured)
+                                    <span class="featured-badge">
+                                        <i class="fas fa-star"></i> Destaque
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <div class="news-card-content">
+                            <div class="news-meta">
+                                <span class="meta-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ optional($post->published_at)->format('d/m/Y') }}
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    {{ $post->reading_time ?? '5' }} min
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-eye"></i>
+                                    {{ $post->views ?? '0' }}
+                                </span>
+                            </div>
+                            
+                            <h3 class="news-title">
+                                <a href="{{ route('posts.show', $post->slug) }}">{{ $post->title }}</a>
+                            </h3>
+                            
+                            <p class="news-excerpt">{{ $post->excerpt }}</p>
+                            
+                            <div class="news-author">
+                                <div class="author-avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div class="author-info">
+                                    <strong>{{ $post->author_name }}</strong>
+                                    <span>Portal HSE</span>
+                                </div>
+                            </div>
+                            
+                            <div class="news-footer">
+                                <a href="{{ route('posts.show', $post->slug) }}" class="read-more-btn">
+                                    Ler Mais <i class="fas fa-arrow-right"></i>
+                                </a>
+                                <div class="news-actions">
+                                    <button class="action-btn" onclick="shareContent('{{ $post->title }}', '{{ route('posts.show', $post->slug) }}')" title="Compartilhar">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                    <button class="action-btn save-btn" data-post-id="{{ $post->id }}" title="Salvar">
+                                        <i class="far fa-bookmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+{{-- NOTÍCIAS EM DESTAQUE + SIDEBAR --}}
+<section class="featured-sidebar-section">
+    <div class="container">
+        <div class="row g-5">
+            {{-- Notícias em Destaque --}}
+            <div class="col-lg-8">
+                <div class="section-header">
+                    <h2 class="section-title">Notícias em Destaque</h2>
+                    <p class="section-subtitle">As publicações mais relevantes e populares da semana</p>
+                </div>
+                
+                <div class="featured-news-grid">
+                    @php $mainFeatured = $popular->first(); @endphp
+                    @if($mainFeatured)
+                    <article class="featured-main-card">
+                        <div class="featured-image">
+                            <a href="{{ route('posts.show', $mainFeatured->slug) }}">
+                                @if($mainFeatured->image_url)
+                                    <img src="{{ asset('storage/'.$mainFeatured->image_url) }}" 
+                                         alt="{{ $mainFeatured->title }}"
+                                         loading="lazy">
+                                @endif
+                                <div class="featured-overlay">
+                                    <span class="featured-label">
+                                        <i class="fas fa-crown"></i> MAIS POPULAR
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="featured-content">
+                            <div class="featured-meta">
+                                <span class="category-tag">{{ $mainFeatured->category->name ?? 'Destaque' }}</span>
+                                <span class="date">
+                                    <i class="fas fa-calendar-alt"></i> 
+                                    {{ optional($mainFeatured->published_at)->format('d \\d\\e F') }}
+                                </span>
+                            </div>
+                            <h3 class="featured-title">
+                                <a href="{{ route('posts.show', $mainFeatured->slug) }}">{{ $mainFeatured->title }}</a>
+                            </h3>
+                            <p class="featured-excerpt">{{ $mainFeatured->excerpt }}</p>
+                            <div class="featured-stats">
+                                <span class="stat">
+                                    <i class="fas fa-eye"></i> {{ $mainFeatured->views ?? '1.2k' }} visualizações
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-comment"></i> {{ $mainFeatured->comments_count ?? '45' }} comentários
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-share"></i> {{ $mainFeatured->shares ?? '120' }} compartilhamentos
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                    @endif
+                    
+                    <div class="featured-secondary-grid">
+                        @foreach($popular->slice(1)->take(4) as $post)
+                            <article class="featured-secondary-card">
+                                <div class="featured-secondary-image">
+                                    <a href="{{ route('posts.show', $post->slug) }}">
+                                        @if($post->image_url)
+                                            <img src="{{ asset('storage/'.$post->image_url) }}" 
+                                                 alt="{{ $post->title }}"
+                                                 loading="lazy">
+                                        @endif
+                                    </a>
+                                    <span class="trending-badge">
+                                        <i class="fas fa-fire"></i> Trending
+                                    </span>
+                                </div>
+                                <div class="featured-secondary-content">
+                                    <h4 class="featured-secondary-title">
+                                        <a href="{{ route('posts.show', $post->slug) }}">{{ $post->title }}</a>
+                                    </h4>
+                                    <div class="featured-secondary-meta">
+                                        <span>{{ optional($post->published_at)->format('d/m') }}</span>
+                                        <span>•</span>
+                                        <span>{{ $post->reading_time ?? '3' }} min</span>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            
+            {{-- Sidebar --}}
+            <div class="col-lg-4">
+                {{-- Newsletter Widget --}}
+                <div class="sidebar-widget newsletter-widget">
+                    <div class="widget-header">
+                        <i class="fas fa-envelope-open-text"></i>
+                        <h3>Newsletter HSE</h3>
+                    </div>
+                    <div class="widget-content">
+                        <p>Inscreva-se para receber as principais notícias, artigos técnicos e oportunidades de HSE.</p>
+                        <form action="{{ route('subscribers.store') }}" method="POST" class="sidebar-newsletter-form" id="sidebarNewsletterForm">
+                            @csrf
+                            <div class="form-group">
+                                <input type="email" 
+                                       name="email" 
+                                       class="form-control" 
+                                       placeholder="seu@email.com"
+                                       required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-paper-plane me-2"></i> Subscrever Agora
+                            </button>
+                        </form>
+                        <div class="newsletter-benefits">
+                            <small>
+                                <i class="fas fa-check-circle text-success me-1"></i> 
+                                Conteúdo exclusivo semanal
+                            </small>
+                            <small>
+                                <i class="fas fa-check-circle text-success me-1"></i> 
+                                Zero spam - pode cancelar quando quiser
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                {{-- Eventos Próximos --}}
+                <div class="sidebar-widget events-widget">
+                    <div class="widget-header">
+                        <i class="fas fa-calendar-day"></i>
+                        <h3>Próximos Eventos</h3>
+                    </div>
+                    <div class="widget-content">
+                        <div class="event-list">
+                            <div class="event-item">
+                                <div class="event-date">
+                                    <span class="event-day">06</span>
+                                    <span class="event-month">MAR</span>
+                                </div>
+                                <div class="event-details">
+                                    <h5>Global HSE & ESG Summit 2026</h5>
+                                    <div class="event-meta">
+                                        <span><i class="fas fa-clock"></i> 08h-14h</span>
+                                        <span><i class="fas fa-map-marker-alt"></i> Epic Sana</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="event-item">
+                                <div class="event-date">
+                                    <span class="event-day">01</span>
+                                    <span class="event-month">ABR</span>
+                                </div>
+                                <div class="event-details">
+                                    <h5>HSE Network Club 2ª Edição</h5>
+                                    <div class="event-meta">
+                                        <span><i class="fas fa-clock"></i> 17h-20h</span>
+                                        <span><i class="fas fa-map-marker-alt"></i> Local a Definir</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="event-item">
+                                <div class="event-date">
+                                    <span class="event-day">02</span>
+                                    <span class="event-month">JULHO</span>
+                                </div>
+                                <div class="event-details">
+                                    <h5>HSE Network Club 3ª Edição</h5>
+                                    <div class="event-meta">
+                                        <span><i class="fas fa-clock"></i> 17h-20h</span>
+                                        <span><i class="fas fa-map-marker-alt"></i> Local a Definir</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="https://ticket.hseangola.com/" target="_blank" class="btn btn-outline-primary w-100 mt-3">
+                            Ver Todos os Eventos
+                        </a>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- VAGAS HSE EM DESTAQUE --}}
+@if(isset($jobsFeatured) && $jobsFeatured->count())
+<section class="jobs-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="header-left">
+                <h2 class="section-title">Vagas em Destaque</h2>
+                <p class="section-subtitle">Oportunidades profissionais em Saúde, Segurança e Ambiente</p>
+            </div>
+            <div class="header-right">
+                <a href="{{ route('jobs.index') }}" class="btn-view-all">
+                    Ver Todas as Vagas <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="jobs-grid">
+            @foreach($jobsFeatured->take(4) as $job)
+                <div class="job-card {{ $job->is_sponsored ? 'sponsored' : '' }}">
+                    @if($job->is_sponsored)
+                        <div class="job-badge sponsored-badge">
+                            <i class="fas fa-bolt"></i> Patrocinada
+                        </div>
+                    @endif
+                    
+                    <div class="job-header">
+                        <div class="job-company">
+                            @if($job->company_logo)
+                                <img src="{{ asset('storage/'.$job->company_logo) }}" 
+                                     alt="{{ $job->company }}"
+                                     class="company-logo">
+                            @else
+                                <div class="company-logo-placeholder">
+                                    {{ substr($job->company, 0, 2) }}
+                                </div>
+                            @endif
+                            <div class="company-info">
+                                <h4 class="company-name">{{ $job->company }}</h4>
+                                <span class="job-location">
+                                    <i class="fas fa-map-marker-alt"></i> {{ $job->location ?? 'Remoto' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-body">
+                        <h3 class="job-title">{{ $job->title }}</h3>
+                        <p class="job-excerpt">{{ \Illuminate\Support\Str::limit($job->description, 120) }}</p>
+                        
+                        <div class="job-tags">
+                            @if($job->job_type)
+                                <span class="job-tag">{{ $job->job_type }}</span>
+                            @endif
+                            @if($job->experience_level)
+                                <span class="job-tag">{{ $job->experience_level }}</span>
+                            @endif
+                            @if($job->salary_range)
+                                <span class="job-tag salary-tag">
+                                    <i class="fas fa-money-bill-wave"></i> {{ $job->salary_range }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <div class="job-footer">
+                        <div class="job-posted">
+                            <small>
+                                <i class="fas fa-clock"></i> 
+                                {{ optional($job->created_at)->diffForHumans() }}
+                            </small>
+                        </div>
+                        <div class="job-actions">
+                            <a href="{{ route('jobs.show', $job->slug) }}" class="btn btn-primary btn-sm">
+                                Ver Vaga
+                            </a>
+                            @if($job->apply_link)
+                                <a href="{{ $job->apply_link }}" 
+                                   target="_blank" 
+                                   class="btn btn-success btn-sm">
+                                    Candidatar
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- VÍDEO INSTITUCIONAL --}}
+<section class="video-section">
+    <div class="container">
+        <div class="video-container">
+            <div class="video-content">
+                <div class="section-header text-start">
+                    <h2 class="section-title">Conheça o Portal HSE</h2>
+                    <p class="section-subtitle">Assista ao nosso vídeo institucional e descubra nossa missão em promover uma cultura de segurança e saúde no trabalho em Angola.</p>
+                </div>
+                
+                <div class="video-features">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Conteúdo técnico atualizado</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Especialistas certificados</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Foco na realidade angolana</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Comunidade ativa de profissionais</span>
+                    </div>
+                </div>
+                
+                <div class="video-cta">
+                    <a href="{{ route('posts.public') }}" class="btn btn-primary">
+                        <i class="fas fa-newspaper me-2"></i> Explorar Notícias
+                    </a>
+                    <a href="{{ route('jobs.index') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-briefcase me-2"></i> Ver Vagas
+                    </a>
+                </div>
+            </div>
+            
+            <div class="video-player">
+                <div class="video-wrapper">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/-qA5yVWFu3U" 
+                                title="Portal HSE - Vídeo Institucional"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                loading="lazy"
+                                id="videoFrame">
+                        </iframe>
+                    </div>
+                    <div class="video-overlay" id="videoOverlay">
+                        <button class="play-btn" id="playVideoBtn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- Links Uteis --}}
+<section>
+    <div class="container py-5">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+            <div>
+                <h1 class="mb-1"><i class="fa-solid fa-link text-primary me-2"></i>Links Úteis</h1>
+                <p class="text-muted mb-0">Acesso rápido a instituições, normas e plataformas relevantes para HSE & ESG.</p>
+            </div>
+        </div>
+
+        @php
+            $titles = [
+                'principais' => 'Instituições & Referências',
+                'certificacao' => 'Certificações & Formação',
+                'instituicoes' => 'Entidades Nacionais',
+                'plataformas' => 'Plataformas do Ecossistema',
+            ];
+        @endphp
+
+        <div class="row g-4">
+            @foreach($sections as $key => $items)
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+                            <h3 class="h5 mb-3">
+                                <i class="fa-solid fa-folder-open me-2 text-primary"></i>
+                                {{ $titles[$key] ?? \Illuminate\Support\Str::title(str_replace('_',' ', $key)) }}
+                            </h3>
+
+                            <div class="row g-3">
+                                @foreach($items as $link)
+                                    <div class="col-12 col-md-6 col-lg-4">
+                                        <a class="useful-link-card" href="{{ $link['url'] }}" target="_blank" rel="noopener">
+                                            <div class="d-flex gap-3">
+                                                <div class="useful-link-icon">
+                                                    <i class="{{ $link['icon'] ?? 'fa-solid fa-arrow-up-right-from-square' }}"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="useful-link-title">{{ $link['label'] }}</div>
+                                                    @if(!empty($link['desc']))
+                                                        <div class="useful-link-desc">{{ $link['desc'] }}</div>
+                                                    @endif
+                                                </div>
+                                                <div class="useful-link-out">
+                                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+{{-- CTA FINAL --}}
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-title">Junte-se à Comunidade HSE</h2>
+            <p class="cta-subtitle">Participe, contribua e faça parte da evolução da cultura de Saúde, Segurança e Ambiente em Angola.</p>
+            
+            <div class="cta-actions">
+                <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i> Crie uma conta no Portal
+                </a>
+                <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i> Já tenho conta
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- MODAIS PARA PROFISSIONAIS --}}
+<!--
+{{-- Modal Técnicos de Segurança --}}
+<div class="modal fade" id="safetyModal" tabindex="-1" aria-labelledby="safetyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="safetyModalLabel">
+                    <i class="fas fa-hard-hat me-2"></i>Técnicos de Segurança Cadastrados
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Buscar técnico..." id="searchSafety">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="filterLocationSafety">
+                            <option value="">Todas as localizações</option>
+                            @foreach(\App\Models\HseTalentProfile::distinct('province')->whereNotNull('province')->pluck('province') as $province)
+                                <option value="{{ $province }}">{{ $province }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="filterExperienceSafety">
+                            <option value="">Todos os níveis</option>
+                            <option value="junior">Júnior</option>
+                            <option value="pleno">Pleno</option>
+                            <option value="senior">Sênior</option>
+                        </select>
+                    </div>
+                </div>
+                
+                {{-- Tabela para desktop --}}
+                <div class="d-none d-lg-block">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Contacto</th>
+                                    <th>Posição Atual</th>
+                                    <th>Localização</th>
+                                    <th>Experiência</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="safetyTableBody">
+                                @forelse($safetyProfessionals as $professional)
+                                <tr>
+                                    <td><strong>{{ $professional->full_name ?? 'Não informado' }}</strong></td>
+                                    <td class="contact-cell">
+                                        @if($professional->phone)
+                                            {{ $professional->phone }}
+                                        @elseif($professional->email)
+                                            {{ $professional->email }}
+                                        @else
+                                            Não informado
+                                        @endif
+                                    </td>
+                                    <td>{{ $professional->current_position ?? 'Não informado' }}</td>
+                                    <td>{{ $professional->province ?? 'Não informado' }}</td>
+                                    <td>
+                                        @if($professional->years_experience)
+                                            {{ $professional->years_experience }} anos
+                                        @elseif($professional->level)
+                                            {{ ucfirst($professional->level) }}
+                                        @else
+                                            Não informado
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            @if($professional->email)
+                                            <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                                <i class="fas fa-envelope"></i>
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-users-slash fa-2x mb-3"></i>
+                                            <p>Nenhum técnico de segurança cadastrado</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                {{-- Cards para mobile --}}
+                <div class="d-block d-lg-none" id="safetyCardsContainer">
+                    <div class="row g-3">
+                        @forelse($safetyProfessionals as $professional)
+                        <div class="col-12">
+                            <div class="card professional-card-mobile">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="card-title mb-1">{{ $professional->full_name ?? 'Não informado' }}</h6>
+                                            <p class="card-subtitle text-muted mb-2">
+                                                <i class="fas fa-briefcase me-1"></i>
+                                                {{ $professional->current_position ?? 'Não informado' }}
+                                            </p>
+                                        </div>
+                                        <span class="badge bg-primary">
+                                            @if($professional->level)
+                                                {{ ucfirst($professional->level) }}
+                                            @else
+                                                {{ $professional->years_experience ? $professional->years_experience . ' anos' : 'Não informado' }}
+                                            @endif
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-phone me-1"></i>
+                                                    Contacto
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">
+                                                @if($professional->phone)
+                                                    {{ $professional->phone }}
+                                                @elseif($professional->email)
+                                                    {{ $professional->email }}
+                                                @else
+                                                    <span class="text-muted">Não informado</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    Localização
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">{{ $professional->province ?? 'Não informado' }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end gap-2 mt-3">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                            <span class="d-none d-md-inline"> Ver</span>
+                                        </button>
+                                        @if($professional->email)
+                                        <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                            <i class="fas fa-envelope"></i>
+                                            <span class="d-none d-md-inline"> Contactar</span>
+                                        </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12">
+                            <div class="text-center py-5 border rounded bg-light">
+                                <i class="fas fa-users-slash fa-2x mb-3 text-muted"></i>
+                                <p class="text-muted mb-0">Nenhum técnico de segurança cadastrado</p>
+                            </div>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Mostrando {{ $safetyProfessionals->count() }} de {{ $totalSafetyTechnicians }} técnicos de segurança
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Médicos do Trabalho --}}
+<div class="modal fade" id="medicalModal" tabindex="-1" aria-labelledby="medicalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="medicalModalLabel">
+                    <i class="fas fa-user-md me-2"></i>Médicos do Trabalho Cadastrados
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{-- Tabela para desktop --}}
+                <div class="d-none d-lg-block">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Contacto</th>
+                                    <th>Posição Atual</th>
+                                    <th>Localização</th>
+                                    <th>Experiência</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="medicalTableBody">
+                                @forelse($medicalProfessionals as $professional)
+                                <tr>
+                                    <td><strong>{{ $professional->full_name ?? 'Não informado' }}</strong></td>
+                                    <td class="contact-cell">
+                                        @if($professional->phone)
+                                            {{ $professional->phone }}
+                                        @elseif($professional->email)
+                                            {{ $professional->email }}
+                                        @else
+                                            Não informado
+                                        @endif
+                                    </td>
+                                    <td>{{ $professional->current_position ?? 'Não informado' }}</td>
+                                    <td>{{ $professional->province ?? 'Não informado' }}</td>
+                                    <td>
+                                        @if($professional->years_experience)
+                                            {{ $professional->years_experience }} anos
+                                        @else
+                                            Não informado
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            @if($professional->email)
+                                            <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                                <i class="fas fa-envelope"></i>
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-user-md fa-2x mb-3"></i>
+                                            <p>Nenhum médico do trabalho cadastrado</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                {{-- Cards para mobile --}}
+                <div class="d-block d-lg-none" id="medicalCardsContainer">
+                    <div class="row g-3">
+                        @forelse($medicalProfessionals as $professional)
+                        <div class="col-12">
+                            <div class="card professional-card-mobile">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="card-title mb-1">{{ $professional->full_name ?? 'Não informado' }}</h6>
+                                            <p class="card-subtitle text-muted mb-2">
+                                                <i class="fas fa-user-md me-1"></i>
+                                                Médico do Trabalho
+                                            </p>
+                                        </div>
+                                        <span class="badge bg-success">
+                                            @if($professional->years_experience)
+                                                {{ $professional->years_experience }} anos
+                                            @else
+                                                Não informado
+                                            @endif
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-phone me-1"></i>
+                                                    Contacto
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">
+                                                @if($professional->phone)
+                                                    {{ $professional->phone }}
+                                                @elseif($professional->email)
+                                                    {{ $professional->email }}
+                                                @else
+                                                    <span class="text-muted">Não informado</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    Localização
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">{{ $professional->province ?? 'Não informado' }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end gap-2 mt-3">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                            <span class="d-none d-md-inline"> Ver</span>
+                                        </button>
+                                        @if($professional->email)
+                                        <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                            <i class="fas fa-envelope"></i>
+                                            <span class="d-none d-md-inline"> Contactar</span>
+                                        </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12">
+                            <div class="text-center py-5 border rounded bg-light">
+                                <i class="fas fa-user-md fa-2x mb-3 text-muted"></i>
+                                <p class="text-muted mb-0">Nenhum médico do trabalho cadastrado</p>
+                            </div>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Mostrando {{ $medicalProfessionals->count() }} de {{ $totalOccupationalDoctors }} médicos do trabalho
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Psicólogos --}}
+<div class="modal fade" id="psychologyModal" tabindex="-1" aria-labelledby="psychologyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-purple text-white">
+                <h5 class="modal-title" id="psychologyModalLabel">
+                    <i class="fas fa-brain me-2"></i>Psicólogos do Trabalho Cadastrados
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{-- Filtros --}}
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Buscar psicólogo..." id="searchPsychology">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="filterLocationPsychology">
+                            <option value="">Todas as localizações</option>
+                            @foreach(\App\Models\HseTalentProfile::distinct('province')->whereNotNull('province')->pluck('province') as $province)
+                                <option value="{{ $province }}">{{ $province }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="filterExperiencePsychology">
+                            <option value="">Todos os níveis</option>
+                            <option value="basico">Básico</option>
+                            <option value="intermedio">Intermediário</option>
+                            <option value="avancado">Avançado</option>
+                            <option value="especialista">Especialista</option>
+                        </select>
+                    </div>
+                </div>
+                
+                {{-- Tabela para desktop --}}
+                <div class="d-none d-lg-block">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Contacto</th>
+                                    <th>Especialização</th>
+                                    <th>Localização</th>
+                                    <th>Experiência</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="psychologyTableBody">
+                                @forelse($psychologyProfessionals as $professional)
+                                <tr>
+                                    <td><strong>{{ $professional->full_name ?? 'Não informado' }}</strong></td>
+                                    <td class="contact-cell">
+                                        @if($professional->phone)
+                                            {{ $professional->phone }}
+                                        @elseif($professional->email)
+                                            {{ $professional->email }}
+                                        @else
+                                            Não informado
+                                        @endif
+                                    </td>
+                                    <td>{{ $professional->current_position ?? 'Psicólogo do Trabalho' }}</td>
+                                    <td>{{ $professional->province ?? 'Não informado' }}</td>
+                                    <td>
+                                        @if($professional->years_experience)
+                                            {{ $professional->years_experience }} anos
+                                        @else
+                                            Não informado
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            @if($professional->email)
+                                            <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                                <i class="fas fa-envelope"></i>
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-brain fa-2x mb-3"></i>
+                                            <p>Nenhum psicólogo cadastrado</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                {{-- Cards para mobile --}}
+                <div class="d-block d-lg-none" id="psychologyCardsContainer">
+                    <div class="row g-3">
+                        @forelse($psychologyProfessionals as $professional)
+                        <div class="col-12">
+                            <div class="card professional-card-mobile">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="card-title mb-1">{{ $professional->full_name ?? 'Não informado' }}</h6>
+                                            <p class="card-subtitle text-muted mb-2">
+                                                <i class="fas fa-brain me-1"></i>
+                                                Psicólogo do Trabalho
+                                            </p>
+                                        </div>
+                                        <span class="badge bg-purple">
+                                            @if($professional->years_experience)
+                                                {{ $professional->years_experience }} anos
+                                            @else
+                                                Não informado
+                                            @endif
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-phone me-1"></i>
+                                                    Contacto
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">
+                                                @if($professional->phone)
+                                                    {{ $professional->phone }}
+                                                @elseif($professional->email)
+                                                    {{ $professional->email }}
+                                                @else
+                                                    <span class="text-muted">Não informado</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    Localização
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">{{ $professional->province ?? 'Não informado' }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-graduation-cap me-1"></i>
+                                                    Especialização
+                                                </small>
+                                            </p>
+                                            <p class="mb-0">{{ $professional->current_position ?? 'Psicólogo do Trabalho' }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end gap-2 mt-3">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                            <span class="d-none d-md-inline"> Ver</span>
+                                        </button>
+                                        @if($professional->email)
+                                        <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                            <i class="fas fa-envelope"></i>
+                                            <span class="d-none d-md-inline"> Contactar</span>
+                                        </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12">
+                            <div class="text-center py-5 border rounded bg-light">
+                                <i class="fas fa-brain fa-2x mb-3 text-muted"></i>
+                                <p class="text-muted mb-0">Nenhum psicólogo cadastrado</p>
+                            </div>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Mostrando {{ $psychologyProfessionals->count() }} de {{ $totalPsychologists }} psicólogos
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{{-- Modal Ambientalistas --}}
+<div class="modal fade" id="environmentalModal" tabindex="-1" aria-labelledby="environmentalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="environmentalModalLabel">
+                    <i class="fas fa-leaf me-2"></i>Ambientalistas Cadastrados
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{-- Filtros --}}
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Buscar ambientalista..." id="searchEnvironmental">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="filterLocationEnvironmental">
+                            <option value="">Todas as localizações</option>
+                            @foreach(\App\Models\HseTalentProfile::distinct('province')->whereNotNull('province')->pluck('province') as $province)
+                                <option value="{{ $province }}">{{ $province }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="filterSpecialtyEnvironmental">
+                            <option value="">Todas especialidades</option>
+                            <option value="gestao">Gestão Ambiental</option>
+                            <option value="residuos">Resíduos</option>
+                            <option value="agua">Recursos Hídricos</option>
+                            <option value="biodiversidade">Biodiversidade</option>
+                            <option value="esg">ESG</option>
+                        </select>
+                    </div>
+                </div>
+                
+                {{-- Tabela para desktop --}}
+                <div class="d-none d-lg-block">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Contacto</th>
+                                    <th>Especialização</th>
+                                    <th>Localização</th>
+                                    <th>Certificações</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="environmentalTableBody">
+                                @forelse($environmentalProfessionals as $professional)
+                                @php
+                                    $certifications = $professional->certifications ? json_decode($professional->certifications, true) : [];
+                                    $certCount = count($certifications);
+                                @endphp
+                                <tr>
+                                    <td><strong>{{ $professional->full_name ?? 'Não informado' }}</strong></td>
+                                    <td class="contact-cell">
+                                        @if($professional->phone)
+                                            {{ $professional->phone }}
+                                        @elseif($professional->email)
+                                            {{ $professional->email }}
+                                        @else
+                                            Não informado
+                                        @endif
+                                    </td>
+                                    <td>{{ $professional->current_position ?? 'Ambientalista' }}</td>
+                                    <td>{{ $professional->province ?? 'Não informado' }}</td>
+                                    <td>
+                                        @if($certCount > 0)
+                                            <span class="badge bg-success">{{ $certCount }} certificações</span>
+                                        @else
+                                            <span class="text-muted">Sem certificações</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            @if($professional->email)
+                                            <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                                <i class="fas fa-envelope"></i>
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-leaf fa-2x mb-3"></i>
+                                            <p>Nenhum ambientalista cadastrado</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                {{-- Cards para mobile --}}
+                <div class="d-block d-lg-none" id="environmentalCardsContainer">
+                    <div class="row g-3">
+                        @forelse($environmentalProfessionals as $professional)
+                        @php
+                            $certifications = $professional->certifications ? json_decode($professional->certifications, true) : [];
+                            $certCount = count($certifications);
+                        @endphp
+                        <div class="col-12">
+                            <div class="card professional-card-mobile">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="card-title mb-1">{{ $professional->full_name ?? 'Não informado' }}</h6>
+                                            <p class="card-subtitle text-muted mb-2">
+                                                <i class="fas fa-leaf me-1"></i>
+                                                Ambientalista
+                                            </p>
+                                        </div>
+                                        <div>
+                                            @if($certCount > 0)
+                                                <span class="badge bg-success">{{ $certCount }} cert.</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-phone me-1"></i>
+                                                    Contacto
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">
+                                                @if($professional->phone)
+                                                    {{ $professional->phone }}
+                                                @elseif($professional->email)
+                                                    {{ $professional->email }}
+                                                @else
+                                                    <span class="text-muted">Não informado</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    Localização
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">{{ $professional->province ?? 'Não informado' }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-graduation-cap me-1"></i>
+                                                    Especialização
+                                                </small>
+                                            </p>
+                                            <p class="mb-0">{{ $professional->current_position ?? 'Ambientalista' }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end gap-2 mt-3">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                            <span class="d-none d-md-inline"> Ver</span>
+                                        </button>
+                                        @if($professional->email)
+                                        <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                            <i class="fas fa-envelope"></i>
+                                            <span class="d-none d-md-inline"> Contactar</span>
+                                        </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12">
+                            <div class="text-center py-5 border rounded bg-light">
+                                <i class="fas fa-leaf fa-2x mb-3 text-muted"></i>
+                                <p class="text-muted mb-0">Nenhum ambientalista cadastrado</p>
+                            </div>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Mostrando {{ $environmentalProfessionals->count() }} de {{ $totalEnvironmentalists }} ambientalistas
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Higienistas --}}
+<div class="modal fade" id="hygieneModal" tabindex="-1" aria-labelledby="hygieneModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="hygieneModalLabel">
+                    <i class="fas fa-hand-sparkles me-2"></i>Higienistas Ocupacionais Cadastrados
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{-- Filtros --}}
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Buscar higienista..." id="searchHygiene">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="filterLocationHygiene">
+                            <option value="">Todas as localizações</option>
+                            @foreach(\App\Models\HseTalentProfile::distinct('province')->whereNotNull('province')->pluck('province') as $province)
+                                <option value="{{ $province }}">{{ $province }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="filterTypeHygiene">
+                            <option value="">Todos os tipos</option>
+                            <option value="ocupacional">Higiene Ocupacional</option>
+                            <option value="alimentar">Higiene Alimentar</option>
+                            <option value="hospitalar">Higiene Hospitalar</option>
+                            <option value="industrial">Higiene Industrial</option>
+                        </select>
+                    </div>
+                </div>
+                
+                {{-- Tabela para desktop --}}
+                <div class="d-none d-lg-block">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Contacto</th>
+                                    <th>Área de Atuação</th>
+                                    <th>Localização</th>
+                                    <th>Experiência</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hygieneTableBody">
+                                @forelse($hygieneProfessionals as $professional)
+                                <tr>
+                                    <td><strong>{{ $professional->full_name ?? 'Não informado' }}</strong></td>
+                                    <td class="contact-cell">
+                                        @if($professional->phone)
+                                            {{ $professional->phone }}
+                                        @elseif($professional->email)
+                                            {{ $professional->email }}
+                                        @else
+                                            Não informado
+                                        @endif
+                                    </td>
+                                    <td>{{ $professional->current_position ?? 'Higienista Ocupacional' }}</td>
+                                    <td>{{ $professional->province ?? 'Não informado' }}</td>
+                                    <td>
+                                        @if($professional->years_experience)
+                                            {{ $professional->years_experience }} anos
+                                        @else
+                                            Não informado
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            @if($professional->email)
+                                            <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                                <i class="fas fa-envelope"></i>
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-hand-sparkles fa-2x mb-3"></i>
+                                            <p>Nenhum higienista cadastrado</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                {{-- Cards para mobile --}}
+                <div class="d-block d-lg-none" id="hygieneCardsContainer">
+                    <div class="row g-3">
+                        @forelse($hygieneProfessionals as $professional)
+                        <div class="col-12">
+                            <div class="card professional-card-mobile">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="card-title mb-1">{{ $professional->full_name ?? 'Não informado' }}</h6>
+                                            <p class="card-subtitle text-muted mb-2">
+                                                <i class="fas fa-hand-sparkles me-1"></i>
+                                                Higienista Ocupacional
+                                            </p>
+                                        </div>
+                                        <span class="badge bg-danger">
+                                            @if($professional->years_experience)
+                                                {{ $professional->years_experience }} anos
+                                            @else
+                                                Não informado
+                                            @endif
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-phone me-1"></i>
+                                                    Contacto
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">
+                                                @if($professional->phone)
+                                                    {{ $professional->phone }}
+                                                @elseif($professional->email)
+                                                    {{ $professional->email }}
+                                                @else
+                                                    <span class="text-muted">Não informado</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    Localização
+                                                </small>
+                                            </p>
+                                            <p class="mb-2">{{ $professional->province ?? 'Não informado' }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="mb-1">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-briefcase me-1"></i>
+                                                    Área de Atuação
+                                                </small>
+                                            </p>
+                                            <p class="mb-0">{{ $professional->current_position ?? 'Higienista Ocupacional' }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end gap-2 mt-3">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewProfessionalDetails('{{ $professional->id }}')" title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                            <span class="d-none d-md-inline"> Ver</span>
+                                        </button>
+                                        @if($professional->email)
+                                        <a href="mailto:{{ $professional->email }}" class="btn btn-sm btn-outline-success" title="Enviar email">
+                                            <i class="fas fa-envelope"></i>
+                                            <span class="d-none d-md-inline"> Contactar</span>
+                                        </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12">
+                            <div class="text-center py-5 border rounded bg-light">
+                                <i class="fas fa-hand-sparkles fa-2x mb-3 text-muted"></i>
+                                <p class="text-muted mb-0">Nenhum higienista cadastrado</p>
+                            </div>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Mostrando {{ $hygieneProfessionals->count() }} de {{ $totalHygienists }} higienistas
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>-->
+
+@endsection
+
+@push('styles')
+<style>
+/* ESTILOS PARA GRÁFICO EM TEMPO REAL */
+.professionals-chart-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 80px 0 40px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    border: 1px solid #e5e7eb;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.chart-header h4 {
+    margin: 0;
+    color: #1e293b;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.chart-header h4 i {
+    color: #3b82f6;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.chart-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.chart-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+.chart-btn.active {
+    border-color: #3b82f6;
+    background: #3b82f6;
+    color: white;
+}
+
+.chart-wrapper {
+    height: 300px;
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legend-label {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+/* Cards de Estatísticas Laterais */
+.stats-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stats-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-color: #3b82f6;
+}
+
+.stats-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.total-card .stats-icon {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.new-card .stats-icon {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.active-card .stats-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.location-card .stats-icon {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+}
+
+.stats-content {
+    flex-grow: 1;
+}
+
+.stats-content h3 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    color: #1e293b;
+    line-height: 1;
+}
+
+.stats-content p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.stats-trend, .stats-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.indicator-dot.online {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+/* Cards Detalhados */
+.professionals-detailed-cards {
+    margin-top: 40px;
+}
+
+.professional-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 2px solid transparent;
+    transition: all 0.4s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.professional-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.professional-card[data-category="safety"]:hover {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+}
+
+.professional-card[data-category="medical"]:hover {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.professional-card[data-category="psychology"]:hover {
+    border-color: #8b5cf6;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+}
+
+.professional-card[data-category="environmental"]:hover {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+}
+
+.professional-card[data-category="hygiene"]:hover {
+    border-color: #ef4444;
+    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+}
+
+.professional-card[data-category="ergonomics"]:hover {
+    border-color: #06b6d4;
+    background: linear-gradient(135deg, #ffffff 0%, #ecfeff 100%);
+}
+
+.card-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.professional-card[data-category="safety"] .card-icon {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.professional-card[data-category="medical"] .card-icon {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.professional-card[data-category="psychology"] .card-icon {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+}
+
+.professional-card[data-category="environmental"] .card-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.professional-card[data-category="hygiene"] .card-icon {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.professional-card[data-category="ergonomics"] .card-icon {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: white;
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+.card-stats {
+    margin-bottom: 20px;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.professional-card[data-category="safety"] .stat-number {
+    color: #3b82f6;
+}
+
+.professional-card[data-category="medical"] .stat-number {
+    color: #10b981;
+}
+
+.professional-card[data-category="psychology"] .stat-number {
+    color: #8b5cf6;
+}
+
+.professional-card[data-category="environmental"] .stat-number {
+    color: #f59e0b;
+}
+
+.professional-card[data-category="hygiene"] .stat-number {
+    color: #ef4444;
+}
+
+.professional-card[data-category="ergonomics"] .stat-number {
+    color: #06b6d4;
+}
+
+.stat-change {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.card-btn {
+    background: transparent;
+    border: 2px solid;
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    max-width: 200px;
+}
+
+.professional-card[data-category="safety"] .card-btn {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.professional-card[data-category="medical"] .card-btn {
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.professional-card[data-category="psychology"] .card-btn {
+    border-color: #8b5cf6;
+    color: #8b5cf6;
+}
+
+.professional-card[data-category="environmental"] .card-btn {
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.professional-card[data-category="hygiene"] .card-btn {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.professional-card[data-category="ergonomics"] .card-btn {
+    border-color: #06b6d4;
+    color: #06b6d4;
+}
+
+.card-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.professional-card[data-category="safety"] .card-btn:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.professional-card[data-category="medical"] .card-btn:hover {
+    background: #10b981;
+    color: white;
+}
+
+.professional-card[data-category="psychology"] .card-btn:hover {
+    background: #8b5cf6;
+    color: white;
+}
+
+.professional-card[data-category="environmental"] .card-btn:hover {
+    background: #f59e0b;
+    color: white;
+}
+
+.professional-card[data-category="hygiene"] .card-btn:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.professional-card[data-category="ergonomics"] .card-btn:hover {
+    background: #06b6d4;
+    color: white;
+}
+
+/* Animações */
+@keyframes countUp {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.stat-number.animate {
+    animation: countUp 0.6s ease-out;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+.stats-card:hover .stats-icon {
+    animation: pulse 2s infinite;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .professionals-chart-section {
+        padding: 40px 0 20px;
+    }
+    
+    .chart-container {
+        padding: 16px;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .chart-wrapper {
+        height: 250px;
+    }
+    
+    .stats-card {
+        padding: 16px;
+    }
+    
+    .stats-content h3 {
+        font-size: 1.75rem;
+    }
+    
+    .professional-card {
+        padding: 20px;
+    }
+    
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .chart-legend {
+        justify-content: center;
+    }
+    
+    .professional-card {
+        margin-bottom: 16px;
+    }
+}
+
+/* Cores para modais */
+.bg-purple {
+    background-color: #8b5cf6 !important;
+}
+
+/* Ajustes para outros elementos da página */
+.stats-section {
+    margin-top: 40px;
+}
+
+.featured-sidebar-section.mt-8 {
+    margin-top: 40px !important;
+}
+
+/* Estilos para a seção de profissionais HSE */
+.professionals-chart-section .section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.professionals-chart-section .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+
+.professionals-chart-section .section-subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Modal estilos */
+.modal-xl {
+    max-width: 1200px;
+}
+
+.modal-header.bg-purple {
+    background-color: #8b5cf6 !important;
+}
+
+.contact-cell {
+    word-break: break-all;
+}
+
+/* Badges para habilidades */
+.skills-tags .badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.8em;
+}
+
+/* Avatar do profissional */
+.professional-avatar {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.professional-avatar i {
+    color: white;
+    font-size: 4rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .professionals-chart-section {
+        padding: 40px 0 20px;
+    }
+    
+    .professionals-chart-section .section-title {
+        font-size: 2rem;
+    }
+    
+    .professionals-chart-section .section-subtitle {
+        font-size: 1rem;
+    }
+    
+    .chart-container {
+        padding: 15px;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .professional-card {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .professionals-detailed-cards .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .professional-card {
+        padding: 20px;
+    }
+    
+    .modal-body .row.mb-3 {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-body .col-md-4 {
+        width: 100%;
+    }
+}
+
+
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    /* Dados do gráfico baseados nos dados reais
+    const professionalData = {
+        labels: [],
+        counts: [],
+        colors: []
+    };
+
+    // Mapeamento de áreas
+    const areasMap = {
+        'tecnico_trabalho': { label: 'Técnicos de Segurança', color: '#3b82f6' },
+        'medico_trabalho': { label: 'Médicos do Trabalho', color: '#10b981' },
+        'psicologos': { label: 'Psicólogos', color: '#8b5cf6' },
+        'ambientalistas': { label: 'Ambientalistas', color: '#f59e0b' },
+        'higienistas': { label: 'Higienistas', color: '#ef4444' },
+        'ergonomistas': { label: 'Ergonomistas', color: '#06b6d4' }
+    };
+
+    // Preencher dados do gráfico com os dados reais do PHP
+    @foreach($professionalsByArea as $areaData)
+        if (areasMap['{{ $areaData->area }}']) {
+            professionalData.labels.push(areasMap['{{ $areaData->area }}'].label);
+            professionalData.counts.push({{ $areaData->total }});
+            professionalData.colors.push(areasMap['{{ $areaData->area }}'].color);
+        }
+    @endforeach
+
+    // Adicionar ergonomistas (se existir)
+    @if($totalErgonomists > 0)
+        professionalData.labels.push('Ergonomistas');
+        professionalData.counts.push({{ $totalErgonomists }});
+        professionalData.colors.push('#06b6d4');
+    @endif
+
+    let chartInstance = null;
+
+    // Inicializar gráfico
+    function initChart(type = 'bar') {
+        const ctx = document.getElementById('professionalsChart').getContext('2d');
+        
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+        
+        const config = {
+            type: type,
+            data: {
+                labels: professionalData.labels,
+                datasets: [{
+                    label: 'Número de Profissionais',
+                    data: professionalData.counts,
+                    backgroundColor: type === 'pie' || type === 'doughnut' 
+                        ? professionalData.colors 
+                        : professionalData.colors.map(color => color + '80'),
+                    borderColor: professionalData.colors,
+                    borderWidth: 2,
+                    borderRadius: type === 'bar' ? 8 : 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw} profissionais`;
+                            }
+                        }
+                    }
+                },
+                scales: type === 'bar' ? {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: Math.ceil(Math.max(...professionalData.counts) / 5),
+                            callback: function(value) {
+                                return value.toLocaleString('pt-BR') + ' prof.';
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                } : {}
+            }
+        };
+        
+        chartInstance = new Chart(ctx, config);
+    }
+
+    // Inicializar com gráfico de barras
+    initChart('bar');
+
+    // Controles do gráfico
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const chartType = this.getAttribute('data-chart');
+            initChart(chartType);
+        });
+    });
+
+    // Animação dos contadores (apenas visual, sem mudar valores)
+    function animateCounter(element) {
+        const currentText = element.textContent;
+        const target = parseInt(currentText.replace(/\./g, '')) || 0;
+        const current = 0;
+        const increment = target / 60;
+        let count = current;
+        
+        const timer = setInterval(() => {
+            count += increment;
+            if (count >= target) {
+                count = target;
+                clearInterval(timer);
+                element.textContent = target.toLocaleString('pt-BR');
+            } else {
+                element.textContent = Math.floor(count).toLocaleString('pt-BR');
+            }
+        }, 20);
+    }
+
+    // Animar todos os contadores ao carregar a página
+    // Animar contadores dos cards
+    const cardCounters = document.querySelectorAll('.professional-card .stat-number');
+    cardCounters.forEach(counter => {
+        animateCounter(counter);
+    });
+    
+    // Animar outros contadores
+    const totalCounter = document.getElementById('totalProfessionalsCounter');
+    const newThisMonth = document.getElementById('newThisMonth');
+    const activeNow = document.getElementById('activeNow');
+    const totalProvinces = document.getElementById('totalProvinces');
+    
+    if (totalCounter) animateCounter(totalCounter);
+    if (newThisMonth) animateCounter(newThisMonth);
+    if (activeNow) animateCounter(activeNow);
+    if (totalProvinces) animateCounter(totalProvinces);
+
+    // Função para visualizar detalhes do profissional via AJAX
+    window.viewProfessionalDetails = function(id) {
+        // Criar um modal de loading
+        const loadingModal = `
+            <div class="modal fade" id="professionalDetailsModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title">Carregando detalhes...</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando...</span>
+                            </div>
+                            <p class="mt-3">Carregando informações do profissional...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Adicionar modal ao DOM
+        if (!document.getElementById('professionalDetailsModal')) {
+            document.body.insertAdjacentHTML('beforeend', loadingModal);
+        }
+        
+        // Mostrar modal de loading
+        const modal = new bootstrap.Modal(document.getElementById('professionalDetailsModal'));
+        modal.show();
+        
+        // Fazer requisição AJAX
+        fetch(`/api/professionals/${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Criar modal com detalhes
+                const detailsModal = `
+                    <div class="modal fade" id="professionalDetailsContent" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title">Detalhes do Profissional</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-4 text-center mb-4">
+                                            <div class="professional-avatar mb-3">
+                                                <i class="fas fa-user-circle fa-5x text-primary"></i>
+                                            </div>
+                                            <h4>${data.full_name || 'Não informado'}</h4>
+                                            <p class="text-muted">${areasMap[data.area]?.label || data.area || 'Profissional HSE'}</p>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <h5 class="mb-3">Informações de Contacto</h5>
+                                            <div class="row mb-4">
+                                                <div class="col-6">
+                                                    <p><strong>Email:</strong><br>${data.email || 'Não informado'}</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p><strong>Telefone:</strong><br>${data.phone || 'Não informado'}</p>
+                                                </div>
+                                                <div class="col-12">
+                                                    <p><strong>Localização:</strong><br>${data.province || 'Não informado'}</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <h5 class="mb-3">Informações Profissionais</h5>
+                                            <div class="row mb-4">
+                                                <div class="col-6">
+                                                    <p><strong>Posição Atual:</strong><br>${data.current_position || 'Não informado'}</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p><strong>Experiência:</strong><br>${data.years_experience ? data.years_experience + ' anos' : 'Não informado'}</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p><strong>Nível:</strong><br>${data.level ? data.level.charAt(0).toUpperCase() + data.level.slice(1) : 'Não informado'}</p>
+                                                </div>
+                                            </div>
+                                            
+                                            ${data.skills && data.skills.length > 0 ? `
+                                            <h5 class="mb-3">Habilidades</h5>
+                                            <div class="skills-tags mb-4">
+                                                ${JSON.parse(data.skills).map(skill => `<span class="badge bg-secondary me-2 mb-2">${skill}</span>`).join('')}
+                                            </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    ${data.email ? `<a href="mailto:${data.email}" class="btn btn-success"><i class="fas fa-envelope me-2"></i>Contactar</a>` : ''}
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Fechar modal de loading
+                modal.hide();
+                
+                // Remover modal de loading
+                document.getElementById('professionalDetailsModal').remove();
+                
+                // Adicionar e mostrar modal com detalhes
+                document.body.insertAdjacentHTML('beforeend', detailsModal);
+                const detailsModalInstance = new bootstrap.Modal(document.getElementById('professionalDetailsContent'));
+                detailsModalInstance.show();
+                
+                // Limpar modal após fechar
+                document.getElementById('professionalDetailsContent').addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar detalhes:', error);
+                
+                // Fechar modal de loading
+                modal.hide();
+                
+                // Remover modal de loading
+                document.getElementById('professionalDetailsModal').remove();
+                
+                // Mostrar erro
+                alert('Não foi possível carregar os detalhes do profissional. Por favor, tente novamente.');
+            });
+    };
+
+    // Filtros para modal de segurança
+    const searchSafety = document.getElementById('searchSafety');
+    const filterLocationSafety = document.getElementById('filterLocationSafety');
+    const filterExperienceSafety = document.getElementById('filterExperienceSafety');
+
+    if (searchSafety) {
+        searchSafety.addEventListener('input', filterSafetyTable);
+    }
+    if (filterLocationSafety) {
+        filterLocationSafety.addEventListener('change', filterSafetyTable);
+    }
+    if (filterExperienceSafety) {
+        filterExperienceSafety.addEventListener('change', filterSafetyTable);
+    }
+
+    function filterSafetyTable() {
+        const searchTerm = searchSafety.value.toLowerCase();
+        const locationFilter = filterLocationSafety.value;
+        const experienceFilter = filterExperienceSafety.value;
+        
+        const rows = document.querySelectorAll('#safetyTableBody tr');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            if (row.style.display === 'none') return;
+            
+            const name = row.cells[0].textContent.toLowerCase();
+            const location = row.cells[3].textContent;
+            const experience = row.cells[4].textContent.toLowerCase();
+            
+            const matchesSearch = name.includes(searchTerm);
+            const matchesLocation = !locationFilter || location === locationFilter;
+            const matchesExperience = !experienceFilter || experience.includes(experienceFilter.toLowerCase());
+            
+            if (matchesSearch && matchesLocation && matchesExperience) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Atualizar contador
+        const counterElement = document.querySelector('#safetyModal .text-muted');
+        if (counterElement) {
+            counterElement.innerHTML = `<i class="fas fa-info-circle"></i> Mostrando ${visibleCount} de ${rows.length} técnicos de segurança`;
+        }
+    }
+
+    // Efeito hover nos cards
+    document.querySelectorAll('.professional-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+            this.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
+        });
+    });
+
+    
+    // Inicializar Bootstrap carousel
+    const heroCarousel = document.getElementById('heroCarousel');
+    if (heroCarousel) {
+        const carousel = new bootstrap.Carousel(heroCarousel, {
+            interval: 5000,
+            wrap: true,
+            touch: true
+        });
+    }*/
+
+    // Contadores animados (seção de estatísticas)
+    const counters = document.querySelectorAll('.stat-number');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-count')) || 0;
+        const increment = target / 50;
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if(current >= target) {
+                current = target;
+                clearInterval(timer);
+                counter.textContent = target.toLocaleString('pt-BR');
+            } else {
+                counter.textContent = Math.floor(current).toLocaleString('pt-BR');
+            }
+        }, 30);
+    });
+    
+    // Filtro de categorias
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const newsCards = document.querySelectorAll('.news-card');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.classList.contains('dropdown-item')) {
+                e.preventDefault();
+            }
+            
+            // Remove active class from all buttons
+            filterBtns.forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            const category = this.getAttribute('data-category');
+            
+            // Filter news cards
+            newsCards.forEach(card => {
+                const cardCategories = card.getAttribute('data-categories');
+                if(category === 'all' || cardCategories.includes(category)) {
+                    card.style.display = 'block';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 10);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        });
+    });
+    
+    // Alternar visualização grid/list
+    const viewBtns = document.querySelectorAll('.view-btn');
+    const newsGrid = document.getElementById('newsGrid');
+    
+    viewBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            viewBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const view = this.getAttribute('data-view');
+            if (view === 'list') {
+                newsGrid.classList.remove('news-grid');
+                newsGrid.classList.add('news-list');
+            } else {
+                newsGrid.classList.remove('news-list');
+                newsGrid.classList.add('news-grid');
+            }
+        });
+    });
+    
+    // Load more functionality
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if(loadMoreBtn) {
+        let currentPage = 1;
+        let isLoading = false;
+        
+        loadMoreBtn.addEventListener('click', async function() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            const spinner = document.getElementById('loadMoreSpinner');
+            const text = document.getElementById('loadMoreText');
+            
+            spinner.classList.remove('d-none');
+            text.textContent = 'Carregando...';
+            this.disabled = true;
+            
+            try {
+                currentPage++;
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // In a real app, you would fetch from your API
+                    // const response = await fetch(`/api/posts?page=${currentPage}`);
+                    // const data = await response.json();
+                    
+                    // For demo, add 3 more cards
+                    const newsGrid = document.getElementById('newsGrid');
+                    const existingCards = document.querySelectorAll('.news-card');
+                    
+                    if (existingCards.length > 0) {
+                        for (let i = 0; i < 3; i++) {
+                            const template = existingCards[0].cloneNode(true);
+                            // Update content for demo
+                            const title = template.querySelector('.news-title a');
+                            title.textContent = 'Nova Notícia ' + (existingCards.length + i + 1);
+                            newsGrid.appendChild(template);
+                        }
+                    }
+                    
+                    spinner.classList.add('d-none');
+                    text.textContent = 'Carregar Mais Notícias';
+                    loadMoreBtn.disabled = false;
+                    isLoading = false;
+                    
+                    // Hide button after 5 pages
+                    if (currentPage >= 5) {
+                        loadMoreBtn.style.display = 'none';
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error loading more news:', error);
+                spinner.classList.add('d-none');
+                text.textContent = 'Tentar Novamente';
+                loadMoreBtn.disabled = false;
+                isLoading = false;
+            }
+        });
+    }
+    
+    // Video play button
+    const playBtn = document.getElementById('playVideoBtn');
+    const videoOverlay = document.getElementById('videoOverlay');
+    const videoFrame = document.getElementById('videoFrame');
+    
+    if(playBtn && videoOverlay && videoFrame) {
+        playBtn.addEventListener('click', function() {
+            const src = videoFrame.src;
+            if (!src.includes('autoplay=1')) {
+                videoFrame.src = src.includes('?') ? src + '&autoplay=1' : src + '?autoplay=1';
+            }
+            videoOverlay.style.display = 'none';
+        });
+    }
+    
+    // Share functionality
+    window.shareContent = function(title, url) {
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                text: 'Confira esta notícia do Portal HSE:',
+                url: url
+            }).then(() => {
+                console.log('Conteúdo compartilhado com sucesso');
+            }).catch(console.error);
+        } else {
+            // Fallback for browsers that don't support Web Share API
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link copiado para a área de transferência!');
+            }).catch(err => {
+                console.error('Erro ao copiar link: ', err);
+            });
+        }
+    };
+    
+    // Save post functionality
+    const saveBtns = document.querySelectorAll('.save-btn');
+    saveBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const icon = this.querySelector('i');
+            
+            // Toggle save state
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                this.style.color = 'var(--accent-color)';
+                // Here you would send an AJAX request to save the post
+                console.log('Post ' + postId + ' salvo');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                this.style.color = '';
+                // Here you would send an AJAX request to unsave the post
+                console.log('Post ' + postId + ' removido');
+            }
+        });
+    });
+    
+    // Newsletter form submission
+    const newsletterForm = document.getElementById('sidebarNewsletterForm');
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processando...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                submitBtn.innerHTML = '<i class="fas fa-check me-2"></i> Inscrito!';
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-success');
+                
+                // Reset form after 2 seconds
+                setTimeout(() => {
+                    this.reset();
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Subscrever Agora';
+                    submitBtn.classList.remove('btn-success');
+                    submitBtn.classList.add('btn-primary');
+                    submitBtn.disabled = false;
+                }, 2000);
+            }, 1500);
+        });
+    }
+    
+    // Scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+            }
+        });
+    }, observerOptions);
+    
+    // Observe elements for animation
+    document.querySelectorAll('.stat-card, .ssa-card, .news-card, .job-card, .professional-card').forEach(el => {
+        observer.observe(el);
+    });
+    
+    // Back to top functionality
+    const backToTop = document.createElement('a');
+    backToTop.href = '#top';
+    backToTop.className = 'back-to-top';
+    backToTop.innerHTML = '<i class="fas fa-chevron-up"></i>';
+    document.body.appendChild(backToTop);
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 500) {
+            backToTop.classList.add('show');
+        } else {
+            backToTop.classList.remove('show');
+        }
+    });
+    
+    backToTop.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+});
+
+// JavaScript para o modal de registro
+let selectedAccountType = null;
+
+function selectAccountType(type) {
+    selectedAccountType = type;
+    
+    // Remover seleção de ambos
+    document.getElementById('cardProfissional').classList.remove('selected');
+    document.getElementById('cardEmpresa').classList.remove('selected');
+    
+    // Adicionar seleção ao escolhido
+    document.getElementById('card' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('selected');
+    
+    // Habilitar botão continuar
+    document.getElementById('continueBtn').disabled = false;
+    document.getElementById('continueBtn').innerHTML = `<i class="fas fa-arrow-right me-2"></i> Continuar como ${type}`;
+}
+
+function continueToRegister() {
+    if (!selectedAccountType) {
+        alert('Por favor, selecione um tipo de conta');
+        return;
+    }
+    
+    // Fechar modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+    modal.hide();
+    
+    // Redirecionar para a página de registro correta
+    if (selectedAccountType === 'profissional') {
+        window.location.href = "{{ route('register.professional') }}";
+    } else if (selectedAccountType === 'empresa') {
+        window.location.href = "{{ route('register.company') }}";
+    }
+}
+
+// Resetar seleção quando modal for fechado
+document.getElementById('registerModal').addEventListener('hidden.bs.modal', function () {
+    selectedAccountType = null;
+    document.getElementById('cardProfissional').classList.remove('selected');
+    document.getElementById('cardEmpresa').classList.remove('selected');
+    document.getElementById('continueBtn').disabled = true;
+    document.getElementById('continueBtn').innerHTML = `<i class="fas fa-arrow-right me-2"></i> Continuar`;
+});
+</script>
+@endpush

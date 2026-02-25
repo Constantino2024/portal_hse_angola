@@ -1,0 +1,2131 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    /* NOVA PALETA DE CORES - HARMONIOSA E PROFISSIONAL */
+    --primary-color: #1a365d;       /* Azul profissional - inspira confiança */
+    --primary-light: #1e314d;       /* Azul mais claro para hover */
+    --primary-dark: #004d99;        /* Azul mais escuro para contrastes */
+    
+    --secondary-color: #004d99;     /* Verde HSE - representa saúde/meio ambiente */
+    --secondary-light: #33cc80;     /* Verde mais claro */
+    --secondary-dark: #008040;      /* Verde mais escuro */
+    
+    --accent-color: #ff6b35;        /* Laranja energético - destaque e ação */
+    --accent-light: #ff9966;        /* Laranja mais claro */
+    --accent-dark: #e65c00;         /* Laranja mais escuro */
+    
+    --neutral-light: #f8f9fa;       /* Fundos claros */
+    --neutral-medium: #e9ecef;      /* Bordas e separadores */
+    --neutral-dark: #2c3e50;        /* Textos escuros */
+    --neutral-text: #333333;        /* Texto principal */
+    
+    --success-color: #28a745;       /* Verde sucesso */
+    --warning-color: #ffc107;       /* Amarelo atenção */
+    --danger-color: #dc3545;        /* Vermelho erro */
+    --info-color: #17a2b8;          /* Azul informação */
+    
+    --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.12);
+    --shadow-large: 0 15px 35px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    line-height: 1.6;
+    font-family: 'Poppins', sans-serif;
+    color: var(--neutral-text);
+    background-color: #ffffff;
+}
+
+/* ... resto do globals.css permanece igual ... */
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+section {
+    padding: 80px 0;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-title h2 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+}
+
+.section-title h2::after {
+    content: '';
+    position: absolute;
+    width: 70px;
+    height: 4px;
+    background: var(--accent-color);
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.section-title p {
+    color: #666;
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--accent-color);
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+}
+
+
+
+.btn:hover {
+    background: #e68a2e;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+
+
+
+.btn-primary {
+    background: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background: #144c63;
+}
+
+.btn-secondary {
+    background: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+    background: #237070;
+}
+
+/* Header */
+header {
+    background-color: white;
+    box-shadow: var(--shadow);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.mt-8{
+    margin-top: 130px;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.logo span {
+    color: var(--accent-color);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+}
+
+.nav-menu li {
+    margin-left: 30px;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: var(--dark-color);
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.nav-menu a:hover {
+    color: var(--accent-color);
+}
+
+.mobile-toggle {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+/* ==== HERO FULL WIDTH ===== */
+.hero {
+    position: relative;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background: #000;
+}
+
+.hero .carousel-item {
+    height: 500px;                  /* altura padrão desktop */
+    min-height: 350px;              /* altura mobile */
+    position: relative;
+}
+
+.hero .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;              /* faz a imagem preencher completamente */
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.hero .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(0,0,0,.65), rgba(0,0,0,.35));
+}
+
+.hero .content {
+    position: absolute;
+    bottom: 60px;
+    left: 8%;
+    width: 55%;
+    color: #fff;
+}
+
+.hero .content h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+}
+
+.hero .content p {
+    font-size: 1rem;
+    opacity: .92;
+}
+
+.hero-buttons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 14px;
+}
+
+/* =========================================
+   SEÇÃO – SAÚDE, SEGURANÇA, AMBIENTE
+========================================= */
+
+.ssa-section {
+    padding: 70px 0;
+    background: var(--light-color);
+}
+
+.ssa-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px;
+}
+
+.ssa-card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--dark-color);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+}
+
+.ssa-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.13);
+}
+
+.ssa-card .ssa-img {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+}
+
+.ssa-card .ssa-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: .4s;
+}
+
+.ssa-card:hover .ssa-img img {
+    transform: scale(1.07);
+}
+
+.ssa-card .ssa-body {
+    padding: 22px;
+}
+
+.ssa-card .ssa-body h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.ssa-card .ssa-body p {
+    font-size: .95rem;
+    opacity: .85;
+}
+
+
+/* About Section */
+.about-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 50px;
+    align-items: center;
+}
+
+.about-text h3 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.about-highlights {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.highlight {
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    background: var(--light-color);
+    transition: var(--transition);
+}
+
+.highlight:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+}
+
+.highlight i {
+    font-size: 2rem;
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+}
+
+/* Hosts Section */
+.hosts-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.host-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+.host-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Wrapper da imagem */
+.host-img-wrapper {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.host-img-container {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    border: 8px solid white;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+}
+
+.host-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.5s ease;
+    filter: grayscale(0.1);
+}
+
+.host-card:hover .host-img {
+    transform: scale(1.05);
+}
+
+.host-img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(106, 17, 203, 0.1) 0%, rgba(37, 117, 252, 0.1) 100%);
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+/* Informações do host */
+.host-info {
+    text-align: center;
+    width: 100%;
+}
+
+.host-info h3 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.host-info .title {
+    display: block;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.host-info p {
+    color: #555;
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+/* Program Section */
+.program-timeline {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.timeline-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 30px;
+    padding: 25px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    transition: var(--transition);
+}
+
+.timeline-item:hover {
+    transform: translateX(5px);
+}
+
+.time {
+    background: var(--primary-color);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: 600;
+    align-self: center;
+}
+
+.event-details h4 {
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.event-details .speaker {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+/* Pricing Section */
+.pricing-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.pricing-card {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.pricing-card.featured {
+    border-color: var(--accent-color);
+    transform: scale(1.05);
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+}
+
+.pricing-card.featured:hover {
+    transform: translateY(-10px) scale(1.05);
+}
+
+.pricing-header h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+}
+
+.price span {
+    font-size: 1rem;
+    color: #777;
+}
+
+.pricing-features {
+    list-style: none;
+    margin: 25px 0;
+    text-align: left;
+}
+
+.pricing-features li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.pricing-features li i {
+    color: #4CAF50;
+    margin-right: 10px;
+}
+
+.discount-info {
+    background: #fff9e6;
+    padding: 25px;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: 50px auto 0;
+    border-left: 4px solid var(--accent-color);
+}
+
+.discount-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.discount-category {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.discount-category h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+/* Courses Section */
+.courses-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.course-card {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    border-top: 4px solid var(--secondary-color);
+}
+
+.course-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.course-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.course-card .instructor {
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.course-details {
+    list-style: none;
+    margin-top: 20px;
+}
+
+.course-details li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.course-details li i {
+    color: var(--accent-color);
+    margin-right: 10px;
+}
+
+/* Sponsorship Table */
+/* Container da tabela - para controlar o scroll */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 30px 0;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+/* Estilo da tabela - mantém largura fixa para desktop */
+.sponsorship-table {
+    width: 100%;
+    min-width: 800px; /* Largura mínima para desktop */
+    border-collapse: collapse;
+    background: white;
+}
+
+.sponsorship-table thead {
+    background-color: var(--primary-color);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sponsorship-table th {
+    padding: 20px 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.sponsorship-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: var(--transition);
+}
+
+.sponsorship-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.sponsorship-table td {
+    padding: 20px 15px;
+    vertical-align: top;
+    min-width: 150px;
+}
+
+/* Células específicas com larguras mínimas */
+.sponsorship-table td:first-child {
+    min-width: 180px; /* Tipo de patrocínio */
+}
+
+.sponsorship-table td:nth-child(2) {
+    min-width: 300px; /* Contrapartidas */
+}
+
+.sponsorship-table td:nth-child(3) {
+    min-width: 120px; /* Valor */
+    text-align: center;
+}
+
+.sponsorship-table td:last-child {
+    min-width: 100px; /* Ação */
+    text-align: center;
+}
+
+/* Estilos dos elementos dentro da tabela */
+.sponsor-type {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sponsor-type i {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.sponsor-benefits {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sponsor-benefits li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+    position: relative;
+    padding-left: 25px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.sponsor-benefits li:last-child {
+    border-bottom: none;
+}
+
+.sponsor-benefits li i {
+    position: absolute;
+    left: 0;
+    top: 9px;
+    color: #4CAF50;
+    font-size: 0.9rem;
+}
+
+.sponsor-price {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    text-align: center;
+    line-height: 1.2;
+}
+
+.sponsor-price small {
+    font-size: 0.9rem;
+    color: #777;
+    display: block;
+    font-weight: normal;
+    margin-top: 5px;
+}
+
+.sponsor-cta {
+    text-align: center;
+}
+
+.sponsor-cta .btn {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+/* Cores para cada tipo de patrocínio */
+.sponsorship-table tr[data-type="oficial"] {
+    background-color: rgba(255, 249, 230, 0.3);
+}
+
+.sponsorship-table tr[data-type="platina"] {
+    background-color: rgba(232, 244, 248, 0.3);
+}
+
+.sponsorship-table tr[data-type="ouro"] {
+    background-color: rgba(255, 249, 230, 0.3);
+}
+
+.sponsorship-table tr[data-type="prata"] {
+    background-color: rgba(240, 240, 240, 0.3);
+}
+
+.sponsorship-table tr[data-type="bronze"] {
+    background-color: rgba(245, 232, 209, 0.3);
+}
+
+.sponsorship-table tr[data-type="expositor"] {
+    background-color: rgba(240, 248, 255, 0.3);
+}
+
+.sponsorship-table tr[data-type="parceiro"] {
+    background-color: rgba(240, 255, 240, 0.3);
+}
+
+.video-highlight-section {
+    background: #f8f9fa;
+}
+
+.video-highlight-section .section-title h2 {
+    color: var(--primary-color);
+}
+
+/* ============================================
+   VERSÃO MOBILE - CARDS EM VEZ DE TABELA
+   (Para dispositivos muito pequenos)
+============================================= */
+
+.sponsorship-cards {
+    display: none; /* Escondido por padrão */
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.sponsorship-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    border-left: 5px solid var(--accent-color);
+    transition: var(--transition);
+}
+
+.sponsorship-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.sponsorship-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
+.sponsorship-card-type {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sponsorship-card-price {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    text-align: right;
+}
+
+.sponsorship-card-price small {
+    display: block;
+    font-size: 0.9rem;
+    color: #777;
+    font-weight: normal;
+}
+
+.sponsorship-card-benefits {
+    list-style: none;
+    margin: 0 0 25px 0;
+    padding: 0;
+}
+
+.sponsorship-card-benefits li {
+    padding: 10px 0;
+    border-bottom: 1px dashed #eee;
+    position: relative;
+    padding-left: 30px;
+}
+
+.sponsorship-card-benefits li:last-child {
+    border-bottom: none;
+}
+
+.sponsorship-card-benefits li i {
+    position: absolute;
+    left: 0;
+    top: 12px;
+    color: #4CAF50;
+}
+
+.sponsorship-card-cta {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Cores para os cards */
+.sponsorship-card[data-type="oficial"] {
+    border-left-color: #d4af37;
+    background: linear-gradient(135deg, #fff9e6 0%, #fff4d4 100%);
+}
+
+.sponsorship-card[data-type="platina"] {
+    border-left-color: #a6a6a6;
+    background: linear-gradient(135deg, #e8f4f8 0%, #d9ecf4 100%);
+}
+
+.sponsorship-card[data-type="ouro"] {
+    border-left-color: #d4af37;
+    background: linear-gradient(135deg, #fff9e6 0%, #fff4d4 100%);
+}
+
+.sponsorship-card[data-type="prata"] {
+    border-left-color: #c0c0c0;
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+}
+
+.sponsorship-card[data-type="bronze"] {
+    border-left-color: #cd7f32;
+    background: linear-gradient(135deg, #f5e8d1 0%, #f0dec4 100%);
+}
+
+.sponsorship-card[data-type="expositor"] {
+    border-left-color: #5a9bd5;
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%);
+}
+
+.sponsorship-card[data-type="parceiro"] {
+    border-left-color: #4CAF50;
+    background: linear-gradient(135deg, #f0fff0 0%, #e6ffe6 100%);
+}
+
+/* Footer */
+footer {
+    background: var(--dark-color);
+    color: white;
+    padding: 70px 0 30px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.footer-col h3 {
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-col h3::after {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 3px;
+    background: var(--accent-color);
+    bottom: 0;
+    left: 0;
+}
+
+.footer-col p {
+    margin-bottom: 15px;
+    opacity: 0.8;
+}
+
+.contact-info {
+    list-style: none;
+}
+
+.contact-info li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.contact-info i {
+    margin-right: 15px;
+    color: var(--accent-color);
+    width: 20px;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: white;
+    transition: var(--transition);
+}
+
+.social-links a:hover {
+    background: var(--accent-color);
+    transform: translateY(-5px);
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
+
+/* Image Placeholder Styles */
+.image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    background-color: #f5f5f5;
+    border: 2px dashed #ccc;
+}
+
+.image-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #aaa;
+}
+
+@media (max-width: 1024px) {
+    .sponsorship-table {
+        min-width: 700px;
+        font-size: 0.95rem;
+    }
+    
+    .sponsorship-table th,
+    .sponsorship-table td {
+        padding: 15px 12px;
+    }
+    
+    .sponsor-type {
+        font-size: 1rem;
+    }
+    
+    .sponsor-benefits li {
+        font-size: 0.85rem;
+        padding-left: 22px;
+    }
+    
+    .sponsor-price {
+        font-size: 1.4rem;
+    }
+    
+    .sponsor-cta .btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .about-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+    }
+    
+    .section-title h2 {
+        font-size: 2rem;
+    }
+    
+    .sponsorship-section {
+        padding: 30px;
+    }
+    
+    .sponsorship-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-menu {
+        position: fixed;
+        top: 80px;
+        left: -100%;
+        flex-direction: column;
+        background-color: white;
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+        padding: 20px 0;
+        z-index: 999;
+    }
+
+    .nav-menu.active {
+        left: 0;
+    }
+
+    .nav-menu li {
+        margin: 15px 0;
+    }
+
+    .mobile-toggle {
+        display: block;
+    }
+
+    .hero {
+        padding: 150px 0 80px;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+
+    .about-highlights {
+        grid-template-columns: 1fr;
+    }
+
+    .timeline-item {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .pricing-card.featured {
+        transform: scale(1);
+    }
+    
+    section {
+        padding: 60px 0;
+    }
+    
+    .sponsorship-table th,
+    .sponsorship-table td {
+        padding: 15px 10px;
+    }
+    
+    .sponsor-price {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+    }
+    
+    .info-item {
+        min-width: 120px;
+    }
+    
+    .discount-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .courses-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   CORREÇÕES PARA DISPOSITIVOS MUITO PEQUENOS
+   (340px e abaixo)
+============================================= */
+
+@media (max-width: 340px) {
+    /* Ajustes gerais */
+    body {
+        font-size: 14px;
+    }
+    
+    .container {
+        width: 95%;
+        padding: 0 10px;
+    }
+    
+    section {
+        padding: 40px 0;
+    }
+    
+    /* Header */
+    .header-container {
+        padding: 15px 0;
+    }
+    
+    .logo {
+        font-size: 1.3rem;
+    }
+    
+    .logo small {
+        font-size: 0.7rem;
+    }
+    
+    /* Hero Section */
+    .hero {
+        padding: 120px 0 60px;
+        margin-top: 60px;
+    }
+    
+    .hero h1 {
+        font-size: 1.5rem;
+        line-height: 1.3;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+    
+    .hero p {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+    
+    .hero-info {
+        gap: 15px;
+        margin: 25px 0;
+    }
+    
+    .info-item {
+        min-width: 100px;
+        padding: 10px;
+    }
+    
+    .info-item i {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+    
+    .info-item span {
+        font-size: 0.85rem;
+    }
+    
+    .info-item small {
+        font-size: 0.7rem;
+    }
+    
+    .hero-buttons {
+        gap: 10px;
+    }
+    
+    .btn {
+        padding: 12px 20px;
+        font-size: 0.85rem;
+        width: 100%;
+        max-width: 280px;
+    }
+    
+    /* Section Titles */
+    .section-title {
+        margin-bottom: 30px;
+    }
+    
+    .section-title h2 {
+        font-size: 1.5rem;
+    }
+    
+    .section-title p {
+        font-size: 0.9rem;
+    }
+    
+    /* About Section */
+    .about-content {
+        gap: 30px;
+    }
+    
+    .about-text h3 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+    
+    .about-highlights {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .highlight {
+        padding: 15px;
+    }
+    
+    .highlight i {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .highlight h4 {
+        font-size: 1rem;
+    }
+    
+    .highlight p {
+        font-size: 0.85rem;
+    }
+    
+    .about-image {
+        height: 200px;
+    }
+    
+    /* Hosts Section */
+    .hosts-container {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .host-img-container {
+        height: 250px;
+    }
+    
+    .host-info {
+        padding: 20px;
+    }
+    
+    .host-info h3 {
+        font-size: 1.3rem;
+    }
+    
+    .host-info .title {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    /* Program Section */
+    .program-timeline {
+        margin-top: 20px;
+    }
+    
+    .timeline-item {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .time {
+        padding: 8px;
+        font-size: 0.9rem;
+        align-self: flex-start;
+    }
+    
+    .event-details h4 {
+        font-size: 1rem;
+    }
+    
+    .event-details p {
+        font-size: 0.85rem;
+    }
+    
+    /* Pricing Section */
+    .pricing-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .pricing-card {
+        padding: 20px;
+    }
+    
+    .pricing-card.featured {
+        transform: none;
+    }
+    
+    .pricing-header h3 {
+        font-size: 1.2rem;
+    }
+    
+    .price {
+        font-size: 2rem;
+    }
+    
+    .pricing-features li {
+        font-size: 0.85rem;
+        padding: 6px 0;
+    }
+    
+    .discount-info {
+        padding: 15px;
+        margin-top: 30px;
+    }
+    
+    .discount-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .discount-category {
+        padding: 15px;
+    }
+    
+    /* Courses Section */
+    .courses-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .course-card {
+        padding: 20px;
+    }
+    
+    .course-card h3 {
+        font-size: 1.2rem;
+    }
+    
+    .course-details li {
+        font-size: 0.85rem;
+        padding: 6px 0;
+    }
+    
+    /* Sponsorship Table */
+    .sponsorship-section {
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .sponsorship-table {
+        font-size: 0.8rem;
+    }
+    
+    .sponsorship-table th,
+    .sponsorship-table td {
+        padding: 10px 5px;
+    }
+    
+    .sponsor-type {
+        font-size: 0.9rem;
+    }
+    
+    .sponsor-type i {
+        font-size: 1rem;
+        margin-right: 5px;
+    }
+    
+    .sponsor-benefits li {
+        font-size: 0.75rem;
+        padding-left: 18px;
+    }
+    
+    .sponsor-benefits li i {
+        font-size: 0.8rem;
+        top: 8px;
+    }
+    
+    .sponsor-price {
+        font-size: 1.2rem;
+    }
+    
+    .sponsor-cta .btn {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+    
+    /* Footer */
+    footer {
+        padding: 40px 0 20px;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .footer-col h3 {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+    
+    .contact-info li {
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+    }
+    
+    .social-links {
+        gap: 10px;
+    }
+    
+    .social-links a {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .copyright {
+        font-size: 0.8rem;
+        padding-top: 20px;
+    }
+    
+    /* Correções específicas para tabelas */
+    .sponsorship-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .sponsorship-table th:nth-child(2),
+    .sponsorship-table td:nth-child(2) {
+        min-width: 200px;
+    }
+    
+    .sponsorship-table th:nth-child(3),
+    .sponsorship-table td:nth-child(3) {
+        min-width: 80px;
+    }
+    
+    .sponsorship-table th:nth-child(4),
+    .sponsorship-table td:nth-child(4) {
+        min-width: 70px;
+    }
+    
+    /* Correções para textos longos */
+    .timeline-content,
+    .host-info p,
+    .course-card p {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    /* Botões em containers pequenos */
+    .sponsor-cta {
+        min-width: 70px;
+    }
+    
+    /* Ajustes para navegação mobile */
+    .nav-menu {
+        top: 60px;
+    }
+    
+    /* Ajustes para padding seguro em dispositivos muito pequenos */
+    .container {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+/* ============================================
+   CORREÇÕES ADICIONAIS PARA 375px - 340px
+============================================= */
+
+@media (max-width: 375px) and (min-width: 341px) {
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .section-title h2 {
+        font-size: 1.7rem;
+    }
+    
+    .host-img-container {
+        height: 280px;
+    }
+    
+    .pricing-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .sponsorship-table {
+        font-size: 0.85rem;
+    }
+}
+
+/* ============================================
+   CORREÇÃO PARA TABELAS EM TODOS OS DISPOSITIVOS PEQUENOS
+============================================= */
+
+@media (max-width: 768px) {
+    .sponsorship-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .sponsorship-table th,
+    .sponsorship-table td {
+        white-space: normal;
+        min-width: 120px;
+    }
+}
+
+/* ============================================
+   CORREÇÃO PARA PREVENIR OVERFLOW HORIZONTAL
+============================================= */
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 100%;
+}
+
+/* ============================================
+   AJUSTES PARA TEXTOS EM DISPOSITIVOS MUITO PEQUENOS
+============================================= */
+
+@media (max-width: 340px) {
+    /* Garantir que textos não quebrem layout */
+    h1, h2, h3, h4, h5, h6 {
+        word-break: break-word;
+    }
+    
+    /* Ajuste específico para títulos longos */
+    .hero h1 {
+        word-break: normal;
+        overflow-wrap: break-word;
+    }
+    
+    /* Ajuste para botões com texto longo */
+    .btn {
+        white-space: normal;
+        line-height: 1.3;
+        padding: 10px 15px;
+    }
+    
+    /* Ajuste para itens do menu mobile */
+    .nav-menu a {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+    
+    /* Correção para o toggle do menu mobile */
+    .mobile-toggle {
+        font-size: 1.3rem;
+    }
+}
+
+/* ============================================
+   CORREÇÃO PARA IMAGENS EM DISPOSITIVOS MUITO PEQUENOS
+============================================= */
+
+@media (max-width: 340px) {
+    .host-img-container,
+    .about-image,
+    .speaker-img-container {
+        height: 200px !important;
+    }
+    
+    .sponsor-item {
+        height: 80px;
+        padding: 10px;
+    }
+    
+    .sponsor-logo {
+        max-height: 60px;
+    }
+}
+
+/* ============================================
+   CORREÇÃO PARA FORMULÁRIOS E INPUTS
+============================================= */
+
+@media (max-width: 340px) {
+    input, select, textarea {
+        font-size: 16px !important; /* Previne zoom no iOS */
+        max-width: 100%;
+    }
+    
+    /* Garantir que inputs não saiam do container */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+/* ============================================
+   CORREÇÃO ESPECÍFICA PARA SAFARI IOS
+============================================= */
+
+@supports (-webkit-touch-callout: none) {
+    @media (max-width: 340px) {
+        .hero {
+            padding-top: 140px; /* Ajuste para safari iOS */
+        }
+        
+        /* Previne comportamento estranho de scroll */
+        .container {
+            -webkit-overflow-scrolling: touch;
+        }
+    }
+}
+
+
+/* Mobile Grande (576px a 767px) */
+@media (max-width: 767px) {
+    .sponsorship-table {
+        min-width: 600px;
+        font-size: 0.9rem;
+    }
+    
+    .sponsorship-table th {
+        font-size: 0.9rem;
+        padding: 12px 10px;
+    }
+    
+    .sponsorship-table td {
+        padding: 12px 10px;
+        min-width: 120px;
+    }
+    
+    .sponsorship-table td:first-child {
+        min-width: 150px;
+    }
+    
+    .sponsorship-table td:nth-child(2) {
+        min-width: 250px;
+    }
+    
+    .sponsor-type {
+        font-size: 0.95rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .sponsor-type i {
+        font-size: 1.1rem;
+    }
+    
+    .sponsor-benefits li {
+        font-size: 0.8rem;
+        padding: 6px 0;
+        padding-left: 20px;
+    }
+    
+    .sponsor-price {
+        font-size: 1.3rem;
+    }
+    
+    .sponsor-price small {
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile Médio (480px a 575px) - TRANSITION PARA CARDS */
+@media (max-width: 575px) {
+    .table-responsive {
+        display: none; /* Esconde a tabela */
+    }
+    
+    .sponsorship-cards {
+        display: flex; /* Mostra os cards */
+    }
+    
+    /* Ajustes para os cards */
+    .sponsorship-card {
+        padding: 20px;
+    }
+    
+    .sponsorship-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .sponsorship-card-price {
+        text-align: left;
+        width: 100%;
+    }
+    
+    .sponsorship-card-benefits li {
+        font-size: 0.9rem;
+        padding-left: 25px;
+    }
+}
+
+/* Mobile Pequeno (360px a 479px) */
+@media (max-width: 479px) {
+    .sponsorship-card {
+        padding: 18px;
+    }
+    
+    .sponsorship-card-type {
+        font-size: 1.1rem;
+    }
+    
+    .sponsorship-card-price {
+        font-size: 1.6rem;
+    }
+    
+    .sponsorship-card-benefits li {
+        font-size: 0.85rem;
+        padding: 8px 0;
+        padding-left: 25px;
+    }
+    
+    .sponsorship-card-benefits li i {
+        top: 10px;
+    }
+    
+    .sponsorship-card-cta .btn {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+/* Mobile Muito Pequeno (até 359px) */
+@media (max-width: 359px) {
+    .sponsorship-card {
+        padding: 15px;
+    }
+    
+    .sponsorship-card-type {
+        font-size: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .sponsorship-card-price {
+        font-size: 1.4rem;
+    }
+    
+    .sponsorship-card-benefits li {
+        font-size: 0.8rem;
+        padding-left: 22px;
+    }
+    
+    .sponsorship-card-benefits li i {
+        font-size: 0.8rem;
+        top: 9px;
+    }
+}
+
+/* ============================================
+   ANIMAÇÃO DE TRANSITION ENTRE TABELA E CARDS
+============================================= */
+
+.sponsorship-cards {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   INDICADOR DE SCROLL PARA TABELA (APENAS MOBILE)
+============================================= */
+
+@media (max-width: 767px) {
+    .table-responsive {
+        position: relative;
+    }
+    
+    .table-responsive::after {
+        content: '← Deslize para ver mais →';
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 100;
+    }
+    
+    .table-responsive:hover::after {
+        opacity: 1;
+    }
+}
+
+
+
+/* ============================================
+   ESTILOS PARA IMPRESSÃO
+============================================= */
+
+@media print {
+    .table-responsive {
+        overflow: visible;
+        box-shadow: none;
+    }
+    
+    .sponsorship-table {
+        min-width: 100%;
+        border: 1px solid #ddd;
+    }
+    
+    .sponsorship-table th {
+        background-color: #f0f0f0 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .sponsor-cta .btn {
+        display: none;
+    }
+}
+
+
+/* Estilos para a seção de citação */
+#quote {
+    position: relative;
+    overflow: hidden;
+}
+
+#quote::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.1;
+    z-index: 0;
+}
+
+.quote-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Estilos para a seção da imagem */
+#featured-quote {
+    transition: all 0.3s ease;
+}
+
+#featured-quote:hover {
+    transform: translateY(-5px);
+}
+
+#featured-quote img {
+    transition: transform 0.5s ease;
+}
+
+#featured-quote:hover img {
+    transform: scale(1.02);
+}
+
+/* MOBILE */
+@media(max-width: 768px){
+    .hero .carousel-item{
+        height: 360px;
+    }
+    .hero .content{
+        width: 90%;
+        left: 5%;
+        bottom: 40px;
+    }
+    .hero .content h1{
+        font-size:1.6rem;
+    }
+}
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+    #quote blockquote p {
+        font-size: 1.1rem;
+    }
+    
+    #featured-quote {
+        padding: 40px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    #quote {
+        padding: 50px 0;
+    }
+    
+    #quote blockquote p {
+        font-size: 1rem;
+    }
+}
+
+.modal-content{
+    width: 500px;
+}
+/* Estilos para o Modal de Registro */
+.account-type-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 25px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+    background: white;
+}
+
+.account-type-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 102, 204, 0.1);
+}
+
+.account-type-card.selected {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(0, 102, 204, 0.05), rgba(0, 102, 204, 0.1));
+    position: relative;
+}
+
+.account-type-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: var(--primary-color);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.account-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.account-type-card h4 {
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.account-description {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.account-features {
+    text-align: left;
+    margin-top: 15px;
+}
+
+.account-features small {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.cta-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+/* Botão CTA */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    border: none;
+    padding: 12px 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+}
+
+.btn-outline-light {
+    border-width: 2px;
+    padding: 12px 30px;
+    font-weight: 600;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .account-type-card {
+        padding: 20px 15px;
+    }
+    
+    .cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cta-actions .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+

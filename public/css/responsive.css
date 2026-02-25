@@ -1,0 +1,781 @@
+/* ============================================
+   RESPONSIVE.CSS
+   Estilos específicos de responsividade
+============================================= */
+
+/* ============================================
+   LARGE DESKTOP (1200px+)
+============================================= */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+    
+    .hero-content {
+        max-width: 800px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ============================================
+   DESKTOP (992px - 1199px)
+============================================= */
+@media (max-width: 1199px) and (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+    
+    .hero-title {
+        font-size: 2.75rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================
+   TABLET (768px - 991px)
+============================================= */
+@media (max-width: 991px) and (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+    
+    .hero-section {
+        min-height: 500px;
+    }
+    
+    .hero-title {
+        font-size: 2.25rem;
+    }
+    
+    .hero-content {
+        padding-bottom: var(--space-2xl);
+    }
+    
+    .nav-menu {
+        gap: var(--space-xs);
+    }
+    
+    .nav-menu a {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.875rem;
+    }
+    
+    .search-input {
+        width: 180px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .ssa-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .news-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .featured-secondary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .jobs-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .video-container {
+        flex-direction: column;
+    }
+    
+    .video-content,
+    .video-player {
+        width: 100%;
+    }
+    
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-xl);
+    }
+}
+
+/* ============================================
+   SMALL TABLET (576px - 767px)
+============================================= */
+@media (max-width: 767px) and (min-width: 576px) {
+    .container {
+        max-width: 540px;
+    }
+    
+    .hero-section {
+        min-height: 450px;
+        margin-top: 70px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-meta {
+        flex-direction: row;
+        gap: var(--space-lg);
+    }
+    
+    .hero-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .hero-actions .btn {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .mobile-toggle {
+        display: flex;
+    }
+    
+    .nav-container {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background-color: var(--neutral-dark);
+        flex-direction: column;
+        padding: var(--space-lg);
+        transition: left var(--transition);
+        overflow-y: auto;
+        z-index: 999;
+    }
+    
+    .nav-container.active {
+        left: 0;
+    }
+    
+    .nav-menu {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .nav-menu a {
+        width: 100%;
+        justify-content: flex-start;
+        padding: var(--space-md);
+    }
+    
+    .search-input {
+        width: 100%;
+    }
+    
+    .stats-grid,
+    .ssa-grid,
+    .news-grid,
+    .featured-secondary-grid,
+    .jobs-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .news-card-image {
+        height: 220px;
+    }
+    
+    .featured-image {
+        height: 250px;
+    }
+    
+    .featured-title {
+        font-size: 1.5rem;
+    }
+    
+    .cta-title {
+        font-size: 2rem;
+    }
+    
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+    }
+    
+    .footer-bottom-content {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--space-md);
+    }
+}
+
+/* ============================================
+   MOBILE (480px - 575px)
+============================================= */
+@media (max-width: 575px) and (min-width: 376px) {
+    .hero-section {
+        min-height: 400px;
+        margin-top: 65px;
+    }
+    
+    .hero-title {
+        font-size: 1.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.875rem;
+    }
+    
+    .hero-tags {
+        gap: var(--space-xs);
+    }
+    
+    .hero-category,
+    .hero-featured {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.7rem;
+    }
+    
+    .hero-meta {
+        flex-direction: column;
+        gap: var(--space-xs);
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+    }
+    
+    .hero-actions .btn {
+        width: 100%;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .section-subtitle {
+        font-size: 0.875rem;
+    }
+    
+    .stat-card {
+        flex-direction: row;
+        padding: var(--space-lg);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.25rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .filter-btn {
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .news-card-content {
+        padding: var(--space-lg);
+    }
+    
+    .featured-content {
+        padding: var(--space-lg);
+    }
+    
+    .featured-title {
+        font-size: 1.25rem;
+    }
+    
+    .featured-stats {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    
+    .job-card {
+        padding: var(--space-lg);
+    }
+    
+    .cta-title {
+        font-size: 1.75rem;
+    }
+    
+    .cta-subtitle {
+        font-size: 1rem;
+    }
+    
+    .partners-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   SMALL MOBILE (375px e abaixo)
+============================================= */
+@media (max-width: 375px) {
+    .hero-section {
+        min-height: 350px;
+        margin-top: 60px;
+    }
+    
+    .hero-title {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.75rem;
+    }
+    
+    .hero-category,
+    .hero-featured {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+    }
+    
+    .hero-meta {
+        font-size: 0.75rem;
+    }
+    
+    .hero-actions .btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+    }
+    
+    .section-subtitle {
+        font-size: 0.75rem;
+    }
+    
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        padding: var(--space-md);
+    }
+    
+    .stat-icon {
+        margin: 0 auto;
+    }
+    
+    .ssa-card.featured::before,
+    .sponsored-badge {
+        right: -20px;
+        padding: 2px 20px;
+        font-size: 0.6rem;
+    }
+    
+    .news-grid {
+        gap: var(--space-lg);
+    }
+    
+    .news-card-image {
+        height: 180px;
+    }
+    
+    .category-badge,
+    .featured-badge {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+    }
+    
+    .featured-image {
+        height: 200px;
+    }
+    
+    .featured-title {
+        font-size: 1.125rem;
+    }
+    
+    .trending-badge {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+    }
+    
+    .event-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .event-date {
+        margin: 0 auto;
+    }
+    
+    .cta-title {
+        font-size: 1.5rem;
+    }
+    
+    .cta-subtitle {
+        font-size: 0.875rem;
+    }
+    
+    .cta-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .cta-actions .btn {
+        width: 100%;
+    }
+    
+    .footer-badges {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* ============================================
+   LANDSCAPE MOBILE
+============================================= */
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero-section {
+        min-height: 80vh;
+    }
+    
+    .hero-content {
+        padding-bottom: var(--space-lg);
+    }
+    
+    .hero-title {
+        font-size: 1.5rem;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .hero-subtitle {
+        display: none;
+    }
+    
+    .hero-meta {
+        display: none;
+    }
+    
+    .hero-actions {
+        flex-direction: row;
+        gap: var(--space-sm);
+    }
+    
+    .hero-actions .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        min-height: 36px;
+    }
+    
+    .hero-actions .btn-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .nav-container {
+        top: 60px;
+        height: calc(100vh - 60px);
+    }
+}
+
+/* ============================================
+   HIGH RESOLUTION SCREENS (Retina)
+============================================= */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .hero-image,
+    .news-card-image img,
+    .featured-image img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* ============================================
+   DARK MODE ADJUSTMENTS
+============================================= */
+@media (prefers-color-scheme: dark) {
+    .hero-overlay {
+        background: linear-gradient(
+            135deg,
+            rgba(0, 0, 0, 0.9) 0%,
+            rgba(0, 0, 0, 0.7) 50%,
+            rgba(0, 0, 0, 0.5) 100%
+        );
+    }
+}
+
+/* ============================================
+   REDUCED MOTION
+============================================= */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .hero-image,
+    .news-card-image img,
+    .featured-image img,
+    .carousel-item.active .hero-image {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .carousel-item.active .hero-image {
+        transform: none !important;
+    }
+    
+    .btn:hover,
+    .card:hover,
+    .ssa-card:hover,
+    .news-card:hover,
+    .job-card:hover,
+    .featured-main-card:hover,
+    .featured-secondary-card:hover {
+        transform: none !important;
+    }
+}
+
+/* ============================================
+   TOUCH DEVICE OPTIMIZATIONS
+============================================= */
+@media (hover: none) and (pointer: coarse) {
+    .btn,
+    .nav-menu a,
+    .action-btn,
+    .play-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .search-input {
+        min-height: 44px;
+    }
+    
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 48px;
+        height: 48px;
+    }
+    
+    /* Remove hover effects on touch devices */
+    .btn:hover,
+    .nav-menu a:hover,
+    .action-btn:hover,
+    .play-btn:hover,
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover,
+    .card:hover,
+    .ssa-card:hover,
+    .news-card:hover,
+    .job-card:hover,
+    .featured-main-card:hover,
+    .featured-secondary-card:hover {
+        transform: none;
+    }
+    
+    /* Add active states for touch feedback */
+    .btn:active,
+    .nav-menu a:active,
+    .action-btn:active,
+    .play-btn:active {
+        opacity: 0.7;
+    }
+    
+    /* Show controls on touch devices */
+    .carousel-control-prev,
+    .carousel-control-next {
+        opacity: 0.7;
+        display: flex !important;
+    }
+    
+    /* Adjust spacing for touch */
+    .nav-menu {
+        gap: var(--space-xs);
+    }
+    
+    .hero-actions {
+        gap: var(--space-sm);
+    }
+}
+
+/* ============================================
+   HIGH CONTRAST MODE
+============================================= */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #004080;
+        --secondary-color: #006400;
+        --accent-color: #b34700;
+        --neutral-dark: #000000;
+        --neutral-light: #1a1a1a;
+        --neutral-medium: #333333;
+        --neutral-text: #ffffff;
+    }
+    
+    .btn {
+        border-width: 3px;
+    }
+    
+    .hero-category,
+    .hero-featured,
+    .category-badge,
+    .featured-badge,
+    .trending-badge,
+    .sponsored-badge {
+        border: 2px solid currentColor;
+    }
+    
+    .carousel-indicators button {
+        border-width: 3px;
+    }
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR FOR WEBKIT
+============================================= */
+@media (min-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--neutral-dark);
+        border-radius: var(--radius-full);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--neutral-medium);
+        border-radius: var(--radius-full);
+        border: 3px solid var(--neutral-dark);
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--neutral-text-muted);
+    }
+}
+
+/* ============================================
+   PRINT OPTIMIZATIONS
+============================================= */
+@media print {
+    @page {
+        margin: 1cm;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+        color: #000;
+        background: #fff;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+    }
+    
+    .section {
+        padding: 1cm 0;
+        break-inside: avoid;
+    }
+    
+    .hero-section {
+        height: auto;
+        margin-top: 0;
+    }
+    
+    .hero-background,
+    .hero-overlay,
+    .carousel-control-prev,
+    .carousel-control-next,
+    .carousel-indicators,
+    .search-wrapper,
+    .social-icons,
+    .scroll-top-btn,
+    .footer-newsletter,
+    .video-overlay,
+    .play-btn {
+        display: none !important;
+    }
+    
+    .hero-content {
+        position: static;
+        color: #000;
+        padding: 1cm 0;
+    }
+    
+    .hero-title {
+        color: #000;
+        text-shadow: none;
+        font-size: 24pt;
+    }
+    
+    .hero-subtitle {
+        color: #333;
+    }
+    
+    a {
+        color: #000 !important;
+        text-decoration: underline;
+    }
+    
+    a[href]:after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        font-weight: normal;
+        color: #666;
+    }
+    
+    .btn,
+    .nav-menu a,
+    .action-btn {
+        border: 1px solid #000;
+        color: #000;
+        background: none;
+        text-decoration: none;
+    }
+    
+    .btn:after {
+        content: none;
+    }
+    
+    .card,
+    .ssa-card,
+    .news-card,
+    .job-card {
+        border: 1px solid #ddd;
+        box-shadow: none;
+        break-inside: avoid;
+    }
+    
+    .img-fluid {
+        max-width: 100% !important;
+        height: auto;
+    }
+    
+    .no-print {
+        display: none !important;
+    }
+    
+    footer {
+        border-top: 1px solid #ddd;
+        margin-top: 2cm;
+    }
+}
